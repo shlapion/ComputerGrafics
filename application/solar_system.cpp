@@ -30,8 +30,11 @@ using namespace gl;
 // vertical field of view of camera
 const float camera_fov = glm::radians(60.0f);
 // initial window dimensions
-const unsigned window_width = 640;
-const unsigned window_height = 480;
+//const unsigned window_width = 640;
+//const unsigned window_height = 480;
+const unsigned window_width = 1920;
+const unsigned window_height = 1080;
+
 // the rendering window
 GLFWwindow* window;
 
