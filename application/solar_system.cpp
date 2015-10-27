@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
   else {
     std::string exe_path{argv[0]};
     resource_path = exe_path.substr(0, exe_path.find_last_of("/\\"));
-    resource_path += "/../../resources/";
+    resource_path += "/../../../resources/";
   }
 
   // do before framebuffer_resize call as it requires the projection uniform location
