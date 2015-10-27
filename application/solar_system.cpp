@@ -288,6 +288,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f});
     update_camera();
   }
+  else if(key == GLFW_KEY_UP && action == GLFW_PRESS) {
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f, 0.0f});
+      update_camera();
+  }
+  else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f, 0.0f});
+      update_camera();
+  }
+  else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+      camera_view = glm::translate(camera_view, glm::vec3{0.1f, 0.0f, 0.0f});
+      update_camera();
+  }
+  else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+      camera_view = glm::translate(camera_view, glm::vec3{-0.1f, 0.0f, 0.0f});
+      update_camera();
+  }
 }
 
 // calculate fps and show in window title
