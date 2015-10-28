@@ -60,7 +60,7 @@ struct model_object {
 model_object planet_object;
 
 // camera matrices
-glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{0.0f, 0.0f, 100.0f});
+glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 0.0f, 150.0f});
 glm::mat4 camera_projection{1.0f};
 
 // uniform locations
@@ -210,10 +210,14 @@ void initialize_geometry() {
 // render model
 //Actual size of the planets referenced to the earth.
 void render() {
+    
+    /* We know its a messy mass of code.
+        We will change it,    later.     */
+    
 //Sun
 glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   glm::mat4 model_matrixSun = glm::rotate(sunSize, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f}); // axis of rotation
-  model_matrixSun = glm::translate(model_matrixSun, glm::vec3{0.0f, 0.0f, 0.0f}); // radius length
+  model_matrixSun = glm::translate(model_matrixSun, glm::vec3{0.0f, 0.0f, 0.0f}); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSun));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixSun = glm::inverseTranspose(camera_view * model_matrixSun);
@@ -228,7 +232,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Mercury
   glm::mat4 MercurySize = glm::scale(glm::mat4{}, glm::vec3{ 0.3829f });
   glm::mat4 model_matrixMercury = glm::rotate(MercurySize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixMercury = glm::translate(model_matrixMercury, glm::vec3{ 0.0f, 0.0f, 0.4f*AU }); // radius length
+  model_matrixMercury = glm::translate(model_matrixMercury, glm::vec3{ 0.0f, 0.0f, 0.4f*AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMercury));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixMercury = glm::inverseTranspose(camera_view * model_matrixMercury);
@@ -242,7 +246,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Venus
   glm::mat4 VenusSize = glm::scale(glm::mat4{}, glm::vec3{ 0.9499f });
   glm::mat4 model_matrixVenus = glm::rotate(VenusSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixVenus = glm::translate(model_matrixVenus, glm::vec3{ 0.0f, 0.0f, 0.7f * AU }); // distance from Sun
+  model_matrixVenus = glm::translate(model_matrixVenus, glm::vec3{ 0.0f, 0.0f, 0.7f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixVenus));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixVenus = glm::inverseTranspose(camera_view * model_matrixVenus);
@@ -257,7 +261,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Earth
   glm::mat4 EarthSize = glm::scale(glm::mat4{}, glm::vec3{ 1.0f });
   glm::mat4 model_matrixEarth = glm::rotate(EarthSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixEarth = glm::translate(model_matrixEarth, glm::vec3{ 0.0f, 0.0f, AU}); // radius length
+  model_matrixEarth = glm::translate(model_matrixEarth, glm::vec3{ 0.0f, 0.0f, AU}); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixEarth));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixEarth = glm::inverseTranspose(camera_view * model_matrixEarth);
@@ -270,9 +274,9 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
 
 
   //Moon
-  glm::mat4 MoonSize = glm::scale(model_matrixEarth, glm::vec3{ 1.0f });
+  glm::mat4 MoonSize = glm::scale(model_matrixEarth, glm::vec3{ 0.273f });
   glm::mat4 model_matrixMoon = glm::rotate(MoonSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixMoon = glm::translate(model_matrixMoon, glm::vec3{ 0.0f, 0.0f, AU }); // radius length
+  model_matrixMoon = glm::translate(model_matrixMoon, glm::vec3{ 0.0f, 0.0f, 0.2f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMoon));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixMoon = glm::inverseTranspose(camera_view * model_matrixMoon);
@@ -286,7 +290,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Mars
   glm::mat4 MarsSize = glm::scale(glm::mat4{}, glm::vec3{ 0.533f });
   glm::mat4 model_matrixMars = glm::rotate(MarsSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixMars = glm::translate(model_matrixMars, glm::vec3{ 0.0f, 0.0f, 1.5f * AU }); // radius length
+  model_matrixMars = glm::translate(model_matrixMars, glm::vec3{ 0.0f, 0.0f, 1.5f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMars));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixMars = glm::inverseTranspose(camera_view * model_matrixMars);
@@ -300,7 +304,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Jupiter
   glm::mat4 JupiterSize = glm::scale(glm::mat4{}, glm::vec3{ 11.209f });
   glm::mat4 model_matrixJupiter = glm::rotate(JupiterSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 5.2f * AU }); // radius length
+  model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 5.2f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixJupiter));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixJupiter = glm::inverseTranspose(camera_view * model_matrixJupiter);
@@ -314,7 +318,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Saturn
   glm::mat4 SaturnSize = glm::scale(glm::mat4{}, glm::vec3{ 9.4492f });
   glm::mat4 model_matrixSaturn = glm::rotate(SaturnSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 9.5f * AU }); // radius length
+  model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 9.5f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSaturn));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixSaturn = glm::inverseTranspose(camera_view * model_matrixSaturn);
@@ -329,7 +333,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Uranus
   glm::mat4 UranusSize = glm::scale(glm::mat4{}, glm::vec3{ 3.929f });
   glm::mat4 model_matrixUranus = glm::rotate(UranusSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixUranus = glm::translate(model_matrixUranus, glm::vec3{ 0.0f, 0.0f, 19.2f * AU }); // radius length
+  model_matrixUranus = glm::translate(model_matrixUranus, glm::vec3{ 0.0f, 0.0f, 19.2f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixUranus));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixUranus = glm::inverseTranspose(camera_view * model_matrixUranus);
@@ -343,7 +347,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   //Neptune
   glm::mat4 NeptuneSize = glm::scale(glm::mat4{}, glm::vec3{ 3.883f });
   glm::mat4 model_matrixNeptune = glm::rotate(NeptuneSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixNeptune = glm::translate(model_matrixNeptune, glm::vec3{ 0.0f, 0.0f, 18.0f }); // radius length
+  model_matrixNeptune = glm::translate(model_matrixNeptune, glm::vec3{ 0.0f, 0.0f, 18.0f }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixNeptune));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixNeptune = glm::inverseTranspose(camera_view * model_matrixNeptune);
@@ -434,52 +438,52 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     update_shader_programs();
   }
   else if(key == GLFW_KEY_W && action == GLFW_PRESS) {
-    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f});
+    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
   }
   else if(key == GLFW_KEY_S && action == GLFW_PRESS) {
-    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f});
+    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU});
     update_camera();
   }
   else if(key == GLFW_KEY_UP && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{-0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
     
   else if(key == GLFW_KEY_W && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f*AU});
       update_camera();
   }
   else if(key == GLFW_KEY_S && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU});
       update_camera();
   }
   else if(key == GLFW_KEY_UP && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_DOWN && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_RIGHT && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_LEFT && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{-0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
 }
