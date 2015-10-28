@@ -210,6 +210,10 @@ void initialize_geometry() {
 // render model
 //Actual size of the planets referenced to the earth.
 void render() {
+    
+    /* We know its a messy mass of code.
+        We will change it,    later.     */
+    
 //Sun
 glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   glm::mat4 model_matrixSun = glm::rotate(sunSize, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f}); // axis of rotation
