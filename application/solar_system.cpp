@@ -434,52 +434,52 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     update_shader_programs();
   }
   else if(key == GLFW_KEY_W && action == GLFW_PRESS) {
-    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f});
+    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
   }
   else if(key == GLFW_KEY_S && action == GLFW_PRESS) {
-    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f});
+    camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU});
     update_camera();
   }
   else if(key == GLFW_KEY_UP && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{-0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
     
   else if(key == GLFW_KEY_W && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f*AU});
       update_camera();
   }
   else if(key == GLFW_KEY_S && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU});
       update_camera();
   }
   else if(key == GLFW_KEY_UP && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_DOWN && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f*AU, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_RIGHT && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
   else if(key == GLFW_KEY_LEFT && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{-0.1f, 0.0f, 0.0f});
+      camera_view = glm::translate(camera_view, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
 }
