@@ -23,8 +23,12 @@
 #include <cstdlib>
 #include <iostream>
 
+
 // use gl definitions from glbinding 
 using namespace gl;
+
+//Defina Astronomical Unit(AU) unit of length roughly equal to the distance from the earth to the sun 
+const float AU = 15.0f;
 
 /////////////////////////// variable definitions //////////////////////////////
 // vertical field of view of camera
@@ -171,7 +175,7 @@ int main(int argc, char* argv[]) {
 // load models
 void initialize_geometry() {
   planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
-  sun = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
+ 
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -204,9 +208,11 @@ void initialize_geometry() {
 
 ///////////////////////////// render functions ////////////////////////////////
 // render model
+//Actual size of the planets referenced to the earth.
 void render() {
 //Sun
-  glm::mat4 model_matrixSun = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f}); // axis of rotation
+glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f}); 
+  glm::mat4 model_matrixSun = glm::rotate(sunSize, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f}); // axis of rotation
   model_matrixSun = glm::translate(model_matrixSun, glm::vec3{0.0f, 0.0f, 0.0f}); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSun));
   // extra matrix for normal transformation to keep them orthogonal to surface
@@ -220,8 +226,9 @@ void render() {
 
 
   //Mercury
-  glm::mat4 model_matrixMercury = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixMercury = glm::translate(model_matrixMercury, glm::vec3{ 0.0f, 0.0f, 3.0f }); // radius length
+  glm::mat4 MercurySize = glm::scale(glm::mat4{}, glm::vec3{ 0.03829f });
+  glm::mat4 model_matrixMercury = glm::rotate(MercurySize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixMercury = glm::translate(model_matrixMercury, glm::vec3{ 0.0f, 0.0f, 0.4f*AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMercury));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixMercury = glm::inverseTranspose(camera_view * model_matrixMercury);
@@ -233,8 +240,9 @@ void render() {
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Venus
-  glm::mat4 model_matrixVenus = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixVenus = glm::translate(model_matrixVenus, glm::vec3{ 0.0f, 0.0f, 6.0f }); // radius length
+  glm::mat4 VenusSize = glm::scale(glm::mat4{}, glm::vec3{ 0.09499f });
+  glm::mat4 model_matrixVenus = glm::rotate(VenusSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixVenus = glm::translate(model_matrixVenus, glm::vec3{ 0.0f, 0.0f, 0.7f * AU }); // distance from Sun
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixVenus));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixVenus = glm::inverseTranspose(camera_view * model_matrixVenus);
@@ -247,8 +255,9 @@ void render() {
 
 
   //Earth
-  glm::mat4 model_matrixEarth = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixEarth = glm::translate(model_matrixEarth, glm::vec3{ 0.0f, 0.0f, 9.0f }); // radius length
+  glm::mat4 EarthSize = glm::scale(glm::mat4{}, glm::vec3{ 0.1f });
+  glm::mat4 model_matrixEarth = glm::rotate(EarthSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixEarth = glm::translate(model_matrixEarth, glm::vec3{ 0.0f, 0.0f, AU}); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixEarth));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixEarth = glm::inverseTranspose(camera_view * model_matrixEarth);
@@ -260,8 +269,9 @@ void render() {
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Mars
-  glm::mat4 model_matrixMars = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixMars = glm::translate(model_matrixMars, glm::vec3{ 0.0f, 0.0f, 9.0f }); // radius length
+  glm::mat4 MarsSize = glm::scale(glm::mat4{}, glm::vec3{ 0.0533f });
+  glm::mat4 model_matrixMars = glm::rotate(MarsSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixMars = glm::translate(model_matrixMars, glm::vec3{ 0.0f, 0.0f, 1.5f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMars));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixMars = glm::inverseTranspose(camera_view * model_matrixMars);
@@ -273,8 +283,9 @@ void render() {
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Jupiter
-  glm::mat4 model_matrixJupiter = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 12.0f }); // radius length
+  glm::mat4 JupiterSize = glm::scale(glm::mat4{}, glm::vec3{ 1.1209f });
+  glm::mat4 model_matrixJupiter = glm::rotate(JupiterSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 5.2f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixJupiter));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixJupiter = glm::inverseTranspose(camera_view * model_matrixJupiter);
@@ -286,8 +297,9 @@ void render() {
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Saturn
-  glm::mat4 model_matrixSaturn = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 15.0f }); // radius length
+  glm::mat4 SaturnSize = glm::scale(glm::mat4{}, glm::vec3{ 0.94492f });
+  glm::mat4 model_matrixSaturn = glm::rotate(SaturnSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 9.5f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSaturn));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixSaturn = glm::inverseTranspose(camera_view * model_matrixSaturn);
@@ -300,8 +312,9 @@ void render() {
 
 
   //Uranus
-  glm::mat4 model_matrixUranus = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixUranus = glm::translate(model_matrixUranus, glm::vec3{ 0.0f, 0.0f, 18.0f }); // radius length
+  glm::mat4 UranusSize = glm::scale(glm::mat4{}, glm::vec3{ 0.3929f });
+  glm::mat4 model_matrixUranus = glm::rotate(UranusSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixUranus = glm::translate(model_matrixUranus, glm::vec3{ 0.0f, 0.0f, 19.2f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixUranus));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixUranus = glm::inverseTranspose(camera_view * model_matrixUranus);
@@ -313,7 +326,8 @@ void render() {
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Neptune
-  glm::mat4 model_matrixNeptune = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  glm::mat4 NeptuneSize = glm::scale(glm::mat4{}, glm::vec3{ 0.3883f });
+  glm::mat4 model_matrixNeptune = glm::rotate(NeptuneSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixNeptune = glm::translate(model_matrixNeptune, glm::vec3{ 0.0f, 0.0f, 18.0f }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixNeptune));
   // extra matrix for normal transformation to keep them orthogonal to surface
