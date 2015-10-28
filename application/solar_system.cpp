@@ -28,7 +28,7 @@
 using namespace gl;
 
 //Defina Astronomical Unit(AU) unit of length roughly equal to the distance from the earth to the sun 
-const float AU = 15.0f;
+const float AU = 30.0f;
 
 /////////////////////////// variable definitions //////////////////////////////
 // vertical field of view of camera
@@ -60,7 +60,7 @@ struct model_object {
 model_object planet_object;
 
 // camera matrices
-glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{0.0f, 0.0f, 4.0f});
+glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{0.0f, 0.0f, 100.0f});
 glm::mat4 camera_projection{1.0f};
 
 // uniform locations
@@ -211,7 +211,7 @@ void initialize_geometry() {
 //Actual size of the planets referenced to the earth.
 void render() {
 //Sun
-glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f}); 
+glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   glm::mat4 model_matrixSun = glm::rotate(sunSize, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f}); // axis of rotation
   model_matrixSun = glm::translate(model_matrixSun, glm::vec3{0.0f, 0.0f, 0.0f}); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSun));
@@ -226,7 +226,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
 
 
   //Mercury
-  glm::mat4 MercurySize = glm::scale(glm::mat4{}, glm::vec3{ 0.03829f });
+  glm::mat4 MercurySize = glm::scale(glm::mat4{}, glm::vec3{ 0.3829f });
   glm::mat4 model_matrixMercury = glm::rotate(MercurySize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixMercury = glm::translate(model_matrixMercury, glm::vec3{ 0.0f, 0.0f, 0.4f*AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMercury));
@@ -240,7 +240,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Venus
-  glm::mat4 VenusSize = glm::scale(glm::mat4{}, glm::vec3{ 0.09499f });
+  glm::mat4 VenusSize = glm::scale(glm::mat4{}, glm::vec3{ 0.9499f });
   glm::mat4 model_matrixVenus = glm::rotate(VenusSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixVenus = glm::translate(model_matrixVenus, glm::vec3{ 0.0f, 0.0f, 0.7f * AU }); // distance from Sun
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixVenus));
@@ -255,7 +255,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
 
 
   //Earth
-  glm::mat4 EarthSize = glm::scale(glm::mat4{}, glm::vec3{ 0.1f });
+  glm::mat4 EarthSize = glm::scale(glm::mat4{}, glm::vec3{ 1.0f });
   glm::mat4 model_matrixEarth = glm::rotate(EarthSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixEarth = glm::translate(model_matrixEarth, glm::vec3{ 0.0f, 0.0f, AU}); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixEarth));
@@ -268,8 +268,23 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
   // draw bound vertex array as triangles using bound shader
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
+
+  //Moon
+  glm::mat4 MoonSize = glm::scale(model_matrixEarth, glm::vec3{ 1.0f });
+  glm::mat4 model_matrixMoon = glm::rotate(MoonSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixMoon = glm::translate(model_matrixMoon, glm::vec3{ 0.0f, 0.0f, AU }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMoon));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixMoon = glm::inverseTranspose(camera_view * model_matrixMoon);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixMoon));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
   //Mars
-  glm::mat4 MarsSize = glm::scale(glm::mat4{}, glm::vec3{ 0.0533f });
+  glm::mat4 MarsSize = glm::scale(glm::mat4{}, glm::vec3{ 0.533f });
   glm::mat4 model_matrixMars = glm::rotate(MarsSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixMars = glm::translate(model_matrixMars, glm::vec3{ 0.0f, 0.0f, 1.5f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMars));
@@ -283,7 +298,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Jupiter
-  glm::mat4 JupiterSize = glm::scale(glm::mat4{}, glm::vec3{ 1.1209f });
+  glm::mat4 JupiterSize = glm::scale(glm::mat4{}, glm::vec3{ 11.209f });
   glm::mat4 model_matrixJupiter = glm::rotate(JupiterSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 5.2f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixJupiter));
@@ -297,7 +312,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Saturn
-  glm::mat4 SaturnSize = glm::scale(glm::mat4{}, glm::vec3{ 0.94492f });
+  glm::mat4 SaturnSize = glm::scale(glm::mat4{}, glm::vec3{ 9.4492f });
   glm::mat4 model_matrixSaturn = glm::rotate(SaturnSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 9.5f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSaturn));
@@ -312,7 +327,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
 
 
   //Uranus
-  glm::mat4 UranusSize = glm::scale(glm::mat4{}, glm::vec3{ 0.3929f });
+  glm::mat4 UranusSize = glm::scale(glm::mat4{}, glm::vec3{ 3.929f });
   glm::mat4 model_matrixUranus = glm::rotate(UranusSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixUranus = glm::translate(model_matrixUranus, glm::vec3{ 0.0f, 0.0f, 19.2f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixUranus));
@@ -326,7 +341,7 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Neptune
-  glm::mat4 NeptuneSize = glm::scale(glm::mat4{}, glm::vec3{ 0.3883f });
+  glm::mat4 NeptuneSize = glm::scale(glm::mat4{}, glm::vec3{ 3.883f });
   glm::mat4 model_matrixNeptune = glm::rotate(NeptuneSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrixNeptune = glm::translate(model_matrixNeptune, glm::vec3{ 0.0f, 0.0f, 18.0f }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixNeptune));
@@ -362,7 +377,7 @@ void update_view(GLFWwindow* window, int width, int height) {
                                                     T const & 	far ) 
      changed far point from 10.0f to 100.0f  - maybe it should a bit smaller... 
      fixes the "bug" you can see in the W-key.mov */
-  camera_projection = glm::perspective(fov_y, aspect, 0.1f, 100.0f);
+  camera_projection = glm::perspective(fov_y, aspect, 0.1f, 1000.0f);
   // upload matrix to gpu
   glUniformMatrix4fv(location_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
 }
