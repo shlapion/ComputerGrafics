@@ -270,9 +270,9 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
 
 
   //Moon
-  glm::mat4 MoonSize = glm::scale(model_matrixEarth, glm::vec3{ 1.0f });
+  glm::mat4 MoonSize = glm::scale(model_matrixEarth, glm::vec3{ 0.273f });
   glm::mat4 model_matrixMoon = glm::rotate(MoonSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixMoon = glm::translate(model_matrixMoon, glm::vec3{ 0.0f, 0.0f, AU }); // radius length
+  model_matrixMoon = glm::translate(model_matrixEarth, glm::vec3{ 0.0f, 0.0f, 0.2f * AU }); // radius length
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMoon));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixMoon = glm::inverseTranspose(camera_view * model_matrixMoon);
