@@ -87,13 +87,15 @@ int main(int argc, char* argv[]) {
   if(!glfwInit()) {
     std::exit(EXIT_FAILURE);  
   }
-
-//on MacOS, set OGL version explicitly 
+    
+//on MacOS, set OGL version explicitly
+    std::string changeDirectory; // dirty fix for directory ../debug/debug/..
 #ifdef __APPLE__
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+   changeDirectory = "/..";
 #endif
 
   // create window, if unsuccessfull, quit
@@ -128,6 +130,7 @@ int main(int argc, char* argv[]) {
   else {
     std::string exe_path{argv[0]};
     resource_path = exe_path.substr(0, exe_path.find_last_of("/\\"));
+      resource_path += changeDirectory;
     resource_path += "/../../resources/";
   }
 
