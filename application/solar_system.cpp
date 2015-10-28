@@ -30,8 +30,8 @@ using namespace gl;
 // vertical field of view of camera
 const float camera_fov = glm::radians(60.0f);
 // initial window dimensions
-const unsigned window_width = 640;
-const unsigned window_height = 480;
+const unsigned window_width = 1000;
+const unsigned window_height = 1000;
 // the rendering window
 GLFWwindow* window;
 
@@ -44,6 +44,7 @@ GLuint simple_program = 0;
 
 // cpu representation of model
 model planet_model{};
+model sun{};
 // holds gpu representation of model
 struct model_object {
   GLuint vertex_AO = 0;
@@ -125,7 +126,7 @@ int main(int argc, char* argv[]) {
   else {
     std::string exe_path{argv[0]};
     resource_path = exe_path.substr(0, exe_path.find_last_of("/\\"));
-    resource_path += "/../../../resources/";
+    resource_path += "/../../resources/";
   }
 
   // do before framebuffer_resize call as it requires the projection uniform location
@@ -164,7 +165,8 @@ int main(int argc, char* argv[]) {
 ///////////////////////// initialisation functions ////////////////////////////
 // load models
 void initialize_geometry() {
-  planet_model = model_loader::obj(resource_path + "models/sphere.obj", model::NORMAL);
+  planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
+  sun = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
 
   // generate vertex array object
   glGenVertexArrays(1, &planet_object.vertex_AO);
@@ -198,17 +200,128 @@ void initialize_geometry() {
 ///////////////////////////// render functions ////////////////////////////////
 // render model
 void render() {
-  glm::mat4 model_matrix = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f});
-  model_matrix = glm::translate(model_matrix, glm::vec3{0.0f, 0.0f, -1.0f});
-  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
+//Sun
+  glm::mat4 model_matrixSun = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{0.0f, 1.0f, 0.0f}); // axis of rotation
+  model_matrixSun = glm::translate(model_matrixSun, glm::vec3{0.0f, 0.0f, 0.0f}); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSun));
   // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::mat4 normal_matrix = glm::inverseTranspose(camera_view * model_matrix);
-  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
+  glm::mat4 normal_matrixSun = glm::inverseTranspose(camera_view * model_matrixSun);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixSun));
 
   glBindVertexArray(planet_object.vertex_AO);
   utils::validate_program(simple_program);
   // draw bound vertex array as triangles using bound shader
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+
+  //Mercury
+  glm::mat4 model_matrixMercury = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixMercury = glm::translate(model_matrixMercury, glm::vec3{ 0.0f, 0.0f, 3.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMercury));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixMercury = glm::inverseTranspose(camera_view * model_matrixMercury);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixMercury));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+  //Venus
+  glm::mat4 model_matrixVenus = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixVenus = glm::translate(model_matrixVenus, glm::vec3{ 0.0f, 0.0f, 6.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixVenus));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixVenus = glm::inverseTranspose(camera_view * model_matrixVenus);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixVenus));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+
+  //Earth
+  glm::mat4 model_matrixEarth = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixEarth = glm::translate(model_matrixEarth, glm::vec3{ 0.0f, 0.0f, 9.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixEarth));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixEarth = glm::inverseTranspose(camera_view * model_matrixEarth);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixEarth));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+  //Mars
+  glm::mat4 model_matrixMars = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixMars = glm::translate(model_matrixMars, glm::vec3{ 0.0f, 0.0f, 9.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixMars));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixMars = glm::inverseTranspose(camera_view * model_matrixMars);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixMars));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+  //Jupiter
+  glm::mat4 model_matrixJupiter = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 12.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixJupiter));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixJupiter = glm::inverseTranspose(camera_view * model_matrixJupiter);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixJupiter));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+  //Saturn
+  glm::mat4 model_matrixSaturn = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 15.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSaturn));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixSaturn = glm::inverseTranspose(camera_view * model_matrixSaturn);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixSaturn));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+
+  //Uranus
+  glm::mat4 model_matrixUranus = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixUranus = glm::translate(model_matrixUranus, glm::vec3{ 0.0f, 0.0f, 18.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixUranus));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixUranus = glm::inverseTranspose(camera_view * model_matrixUranus);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixUranus));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+  //Neptune
+  glm::mat4 model_matrixNeptune = glm::rotate(glm::mat4{}, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrixNeptune = glm::translate(model_matrixNeptune, glm::vec3{ 0.0f, 0.0f, 18.0f }); // radius length
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixNeptune));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrixNeptune = glm::inverseTranspose(camera_view * model_matrixNeptune);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrixNeptune));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
+
+
+ 
 }
 
 ///////////////////////////// update functions ////////////////////////////////
