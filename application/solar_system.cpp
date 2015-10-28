@@ -341,8 +341,14 @@ void update_view(GLFWwindow* window, int width, int height) {
   if(width < height) {
     fov_y = 2.0f * glm::atan(glm::tan(camera_fov * 0.5f) * (1.0f / aspect));
   }
-  // projection is hor+ 
-  camera_projection = glm::perspective(fov_y, aspect, 0.1f, 10.0f);
+  // projection is hor+  - Creates a matrix for a symetric perspective-view frustum.
+    /*    detail::tmat4x4<T> glm::perspective	(	T const & 	fovy,
+                                                    T const & 	aspect,
+                                                    T const & 	near,
+                                                    T const & 	far ) 
+     changed far point from 10.0f to 100.0f  - maybe it should a bit smaller... 
+     fixes the "bug" you can see in the W-key.mov */
+  camera_projection = glm::perspective(fov_y, aspect, 0.1f, 100.0f);
   // upload matrix to gpu
   glUniformMatrix4fv(location_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
 }
