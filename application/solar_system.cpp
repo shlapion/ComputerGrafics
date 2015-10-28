@@ -60,7 +60,7 @@ struct model_object {
 model_object planet_object;
 
 // camera matrices
-glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{0.0f, 0.0f, 100.0f});
+glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 0.0f, 150.0f});
 glm::mat4 camera_projection{1.0f};
 
 // uniform locations
