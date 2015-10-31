@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-   changeDirectory = "/..";
+//   changeDirectory = "/..";
 #endif
 
   // create window, if unsuccessfull, quit
