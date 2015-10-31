@@ -1,3 +1,6 @@
+114274 - **Endre Papp**
+113260 - **Martin Heinrich**
+
 ## OpenGLFramework
 is a small cross-platform framework
 
