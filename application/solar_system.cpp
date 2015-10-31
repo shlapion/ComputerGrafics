@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-   changeDirectory = "/..";
+//   changeDirectory = "/..";
 #endif
 
   // create window, if unsuccessfull, quit
@@ -302,9 +302,9 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Jupiter
-  glm::mat4 JupiterSize = glm::scale(glm::mat4{}, glm::vec3{ 11.209f });
+  glm::mat4 JupiterSize = glm::scale(glm::mat4{}, glm::vec3{ 6.0f });
   glm::mat4 model_matrixJupiter = glm::rotate(JupiterSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 5.2f * AU }); // radius of the rotation axis defined in AU
+  model_matrixJupiter = glm::translate(model_matrixJupiter, glm::vec3{ 0.0f, 0.0f, 3.2f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixJupiter));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixJupiter = glm::inverseTranspose(camera_view * model_matrixJupiter);
@@ -316,9 +316,9 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 
   //Saturn
-  glm::mat4 SaturnSize = glm::scale(glm::mat4{}, glm::vec3{ 9.4492f });
+  glm::mat4 SaturnSize = glm::scale(glm::mat4{}, glm::vec3{ 5.0f });
   glm::mat4 model_matrixSaturn = glm::rotate(SaturnSize, float(glfwGetTime()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 9.5f * AU }); // radius of the rotation axis defined in AU
+  model_matrixSaturn = glm::translate(model_matrixSaturn, glm::vec3{ 0.0f, 0.0f, 5.5f * AU }); // radius of the rotation axis defined in AU
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrixSaturn));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrixSaturn = glm::inverseTranspose(camera_view * model_matrixSaturn);
