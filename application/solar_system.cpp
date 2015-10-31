@@ -19,6 +19,7 @@
 #include "model_loader.hpp"
 #include "texture_loader.hpp"
 #include "utils.hpp"
+#include "planet.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -82,6 +83,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void initialize_geometry();
 void show_fps();
 void render();
+void render(Planet const&, glm::mat4 const&);
 
 /////////////////////////////// main function /////////////////////////////////
 int main(int argc, char* argv[]) {
@@ -160,8 +162,24 @@ int main(int argc, char* argv[]) {
     glfwPollEvents();
     // clear buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    std::vector<Planet> solarSystem;
+
+    solarSystem.push_back(Planet{"sun",0.0f,0.0f,10.90f});
+    solarSystem.push_back(Planet{"mercury",0.4f*AU,2.0f,0.3829f});
+    solarSystem.push_back(Planet{"venus",0.7f*AU,2.0f,0.9499f});
+    solarSystem.push_back(Planet{"earth",AU,1.0f,1.0f});
+    solarSystem.push_back(Planet{"mars",1.5f*AU,1.0f,0.533f});
+    solarSystem.push_back(Planet{"jupiter",3.2f*AU,0.8f,6.0f});
+    solarSystem.push_back(Planet{"saturn",5.5f*AU,0.7f,5.0f});
+    solarSystem.push_back(Planet{"uranus",19.2f*AU,0.5f,3.929f});
+    solarSystem.push_back(Planet{"neptun",18.0f*AU,0.4f,3.883f});
+
+
     // draw geometry
-    render();
+    for (auto const& p:solarSystem) {
+      render(p,glm::mat4{});
+    }
     // swap draw buffer to front
     glfwSwapBuffers(window);
     // display fps
@@ -357,9 +375,24 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
   utils::validate_program(simple_program);
   // draw bound vertex array as triangles using bound shader
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
-
-
  
+}
+
+void render(Planet const& planet, glm::mat4 const& parentPosition) {
+
+  glm::mat4 model_matrix = glm::rotate(parentPosition, float(glfwGetTime()*planet.speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet.distance() }); // radius of the rotation axis defined in AU
+  model_matrix = glm::scale(model_matrix, glm::vec3{planet.size()});
+  
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrix = glm::inverseTranspose(camera_view * model_matrix);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
+
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
 }
 
 ///////////////////////////// update functions ////////////////////////////////
