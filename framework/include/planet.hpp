@@ -16,7 +16,17 @@ public:
             name_{name},
             distance_{(distance>0.0f)?distance:-1.0f},
             speed_{(speed>0.0f)?speed:-1.0f},
-            size_{(size>0.0f)?size:-1.0f}
+            size_{(size>0.0f)?size:-1.0f},
+            child_{nullptr},
+            parent_{nullptr}
+    { };
+    Planet(std::string name, float distance, float speed, float size, Planet* child) :
+            name_{name},
+            distance_{(distance>0.0f)?distance:-1.0f},
+            speed_{(speed>0.0f)?speed:-1.0f},
+            size_{(size>0.0f)?size:-1.0f},
+            child_{child},
+            parent_{nullptr}
     { };
 
     float distance() const {
@@ -31,12 +41,19 @@ public:
         return size_;
     }
 
+    bool hasMoon() const {
+        return child_ != nullptr;
+    }
+
 private:
     std::string name_;
-    float distance_;
+    float distance_; // to the sun? [0,0,0] --> z
+    // Winkel, Höhenwinkel, Azimut? https://de.wikipedia.org/wiki/Azimut
     float speed_;
     float size_;
-    //position
+    Planet* child_; // there could be more than one moon... hmm. maybe better perant?!!
+    Planet* parent_;
+    //position --> time, rotation
     //transformationMatrix
     //inverTransposedMatrix
     //Texture
@@ -44,7 +61,7 @@ private:
 };
 
 /*
- Shape 
+ Shape => Planet as list or tree or
     -> Composit
     -> Planet
     -> Moon?
