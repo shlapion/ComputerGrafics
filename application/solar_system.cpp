@@ -100,8 +100,9 @@ void initialize_planet_geometry();
 void initialize_starfield_geometry();
 void show_fps();
 void render();
-void render_planet();
-void render_starfield();
+//void render_planet();
+void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition);
+//void render_starfield();
 
 /////////////////////////////// main function /////////////////////////////////
 int main(int argc, char* argv[]) {
@@ -238,6 +239,10 @@ std::vector<float>  generate_starCloud(int num_stars) {
     stars.push_back(x);
     stars.push_back(y);
     stars.push_back(z);
+    // Color
+    stars.push_back(1.0f);
+    stars.push_back(1.0f);
+    stars.push_back(1.0f);
   }
   return stars;
 }
@@ -263,11 +268,11 @@ void initialize_planet_geometry() {
   // activate first attribute on gpu
   glEnableVertexAttribArray(0);
   // first attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::POSITION]);
+  glVertexAttribPointer(0, model::POSITION.components, (gl::GLenum) model::POSITION.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::POSITION]);
   // activate second attribute on gpu
   glEnableVertexAttribArray(1);
   // second attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
+  glVertexAttribPointer(1, model::NORMAL.components, (gl::GLenum) model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
 
    // generate generic buffer
   glGenBuffers(1, &planet_object.element_BO);
@@ -318,22 +323,36 @@ void initialize_starfield_geometry() {
 // render model
 //Actual size of the planets referenced to the earth.
 void render() {
-  render_planet();
-  render_starfield();
+/*  glUseProgram(starCloud_program);
+  glBindVertexArray(starfield_object.vertex_AO);
+  utils::validate_program(starCloud_program);
+  glDrawArrays(GL_POINT, 0, number_of_stars);*/
+
+
+  glUseProgram(simple_program);
+  for (auto const &p : solarSystem) {
+    render_Planet(p, glm::mat4{});
+  }
+  //render_planet();
+
 }
 
-void render_planet() {
-  glUseProgram(simple_program);
-  update_shader_programs();
+void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition) {
 
+  glm::mat4 model_matrix = glm::rotate(parentPosition, float(glfwGetTime()*planet->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance() }); // radius of the rotation axis defined in AU
+  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size()});
 
-  // draw geometry
-  for (auto p: solarSystem) { // maybe better in renderer fro planets?
-    glm::vec3 position;
-    glm::mat4 transformation;
-    glm::mat4 normal_transformation;
+  glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
+  // extra matrix for normal transformation to keep them orthogonal to surface
+  glm::mat4 normal_matrix = glm::inverseTranspose(camera_view * model_matrix);
+  glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 
-    float time = glfwGetTime();
+  glBindVertexArray(planet_object.vertex_AO);
+  utils::validate_program(simple_program);
+  // draw bound vertex array as triangles using bound shader
+  glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), (gl::GLenum) model::INDEX.type, NULL);
+/*    float time = glfwGetTime();
     Planet* current = p;
     while (current != nullptr) { // maybe better in renderer. Interesting moonaction....
       position.x += glm::cos(time * current->speed()) * current->distance();
@@ -353,20 +372,9 @@ void render_planet() {
     glBindVertexArray(planet_object.vertex_AO);
     utils::validate_program(simple_program);
     // draw bound vertex array as triangles using bound shader
-    glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);
-
-  }
-}
-
-void render_starfield() {
-  glUseProgram(starCloud_program);
-  update_shader_programs();
+    glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);*/
 
 
-
-  glBindVertexArray(starfield_object.vertex_AO);
-  utils::validate_program(starCloud_program);
-  glDrawArrays(GL_POINT, 0, number_of_stars);
 }
 
 ///////////////////////////// update functions ////////////////////////////////
@@ -517,6 +525,11 @@ void quit(int status) {
   glDeleteBuffers(1, &planet_object.vertex_BO);
   glDeleteVertexArrays(1, &planet_object.element_BO);
   glDeleteVertexArrays(1, &planet_object.vertex_AO);
+
+  glDeleteProgram(starCloud_program);
+  glDeleteBuffers(1, &starfield_object.vertex_BO);
+  glDeleteVertexArrays(1, &starfield_object.element_BO);
+  glDeleteVertexArrays(1, &starfield_object.vertex_AO);
 
   // free glfw resources
   glfwDestroyWindow(window);
