@@ -293,10 +293,10 @@ model_object initialize_geometry( model & mod ) {
 // render model
 //Actual size of the planets referenced to the earth.
 void render() {
-  glUseProgram(starCloud_program);
+/*  glUseProgram(starCloud_program);
   glBindVertexArray(starfield_object.vertex_AO);
   utils::validate_program(starCloud_program);
-  glDrawArrays(GL_POINT, 0, number_of_stars);
+  glDrawArrays(GL_POINT, 0, number_of_stars);*/
 
 
   glUseProgram(simple_program);
@@ -322,29 +322,6 @@ void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition) {
   utils::validate_program(simple_program);
   // draw bound vertex array as triangles using bound shader
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), (gl::GLenum) model::INDEX.type, NULL);
-/*    float time = glfwGetTime();
-    Planet* current = p;
-    while (current != nullptr) { // maybe better in renderer. Interesting moonaction....
-      position.x += glm::cos(time * current->speed()) * current->distance();
-      position.y += glm::sin(time * current->speed()) * current->distance();
-      current = current->child();
-    }
-    transformation = glm::translate(transformation,position);
-    transformation = glm::scale(transformation,glm::vec3 {current->size()});
-
-//    glm::mat4 model_matrix = glm::rotate(transformation, float(glfwGetTime()*current->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-
-    glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(transformation));
-    // extra matrix for normal transformation to keep them orthogonal to surface
-    normal_transformation = glm::inverseTranspose(glm::inverse(camera_view) * transformation);
-    glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_transformation));
-
-    glBindVertexArray(planet_object.vertex_AO);
-    utils::validate_program(simple_program);
-    // draw bound vertex array as triangles using bound shader
-    glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), model::INDEX.type, NULL);*/
-
-
 }
 
 ///////////////////////////// update functions ////////////////////////////////
