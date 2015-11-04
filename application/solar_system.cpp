@@ -22,6 +22,7 @@
 #include "texture_loader.hpp"
 #include "utils.hpp"
 #include "planet.hpp"
+#include "Shader_Programm.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -51,6 +52,7 @@ unsigned frames_per_second = 0;
 
 // the main shader program
 GLuint simple_program = 0;
+GLuint starCloud_program = 0;
 
 // cpu representation of model
 model planet_model{};
@@ -361,6 +363,12 @@ void update_view(GLFWwindow* window, int width, int height) {
 // update camera transformation
 void update_camera() {
   // vertices are transformed in camera space, so camera transform must be inverted
+  /*
+    glm::vec3 eye = camera_position;
+    glm::vec3 center = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    camera_view = glm::inverse(glm::lookAt(eye,center,up));
+  */
   glm::mat4 inv_camera_view = glm::inverse(camera_view);
   // upload matrix to gpu
   glUniformMatrix4fv(location_view_matrix, 1, GL_FALSE, glm::value_ptr(inv_camera_view));
@@ -368,24 +376,34 @@ void update_camera() {
 
 // load shaders and update uniform locations
 void update_shader_programs() {
-  try {
-    // throws exception when compiling was unsuccessfull
-    GLuint new_program = shader_loader::program(resource_path + "shaders/simple.vert",
-                                                resource_path + "shaders/simple.frag");
-    // free old shader
-    glDeleteProgram(simple_program);
-    // save new shader
-    simple_program = new_program;
-    // bind shader
-    glUseProgram(simple_program);
-    // after shader is recompiled uniform locations may change
-    update_uniform_locations();
+  /* defined at the top!!
+    GLuint simple_program = 0;
+    GLuint starCloud_program = 0;
+    */
+    std::vector<Shader_Programm> shaders;
+  shaders.push_back({"shaders/simple.vert", "shaders/simple.frag", &simple_program});
+  shaders.push_back({"shaders/starCloud.vert","shaders/star/Cloud.frag", &starCloud_program});
 
-    // upload view uniforms to new shader
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    update_view(window, width, height);
-    update_camera();
+  try {
+    for (auto item : shaders) {
+      // throws exception when compiling was unsuccessfull
+      GLuint new_program = shader_loader::program(resource_path + item.vertex_path,
+                                                  resource_path + item.frag_path);
+      // free old shader
+      glDeleteProgram(*item.programm);
+      // save new shader
+      *item.programm = new_program;
+      // bind shader
+      glUseProgram(*item.programm);
+      // after shader is recompiled uniform locations may change
+      update_uniform_locations();
+
+      // upload view uniforms to new shader
+      int width, height;
+      glfwGetFramebufferSize(window, &width, &height);
+      update_view(window, width, height);
+      update_camera();
+    }
   }
   catch(std::exception&) {
     // dont crash, allow another try
