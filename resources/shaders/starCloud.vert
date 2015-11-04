@@ -7,7 +7,7 @@ layout(location=1) in vec3 in_Color;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 
-out vec4 pass_Color;
+out vec3 pass_Color;
 
 void main(void)
 {

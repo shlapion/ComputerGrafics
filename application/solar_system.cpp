@@ -437,14 +437,14 @@ void update_shader_programs() {
       // bind shader
       glUseProgram(*item.programm);
       // after shader is recompiled uniform locations may change
-      //update_uniform_locations();
 
-      // upload view uniforms to new shader
-      int width, height;
-      glfwGetFramebufferSize(window, &width, &height);
-      update_view(window, width, height);
-      update_camera();
     }
+    update_uniform_locations();
+    // upload view uniforms to new shader
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    update_view(window, width, height);
+    update_camera();
   }
   catch(std::exception&) {
     // dont crash, allow another try
