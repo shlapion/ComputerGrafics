@@ -75,6 +75,10 @@ GLint location_model_matrix = -1;
 GLint location_view_matrix = -1;
 GLint location_projection_matrix = -1;
 
+// starClaud location
+GLint starCloud_view_matrix = -1;
+GLint starCloud_projection_matrix = -1;
+
 // path to the resource folders
 std::string resource_path{};
 
@@ -305,6 +309,10 @@ void render() {
 }
 
 void render_planet() {
+  glUseProgram(simple_program);
+  update_camera();
+  update_uniform_locations();
+
   // draw geometry
   for (auto p: solarSystem) { // maybe better in renderer fro planets?
     glm::vec3 position;
@@ -337,7 +345,14 @@ void render_planet() {
 }
 
 void render_starfield() {
+  glUseProgram(starCloud_program);
+  update_shader_programs();
+  update_camera();
 
+
+  glBindVertexArray(starfield_object.vertex_AO);
+  utils::validate_program(starCloud_program);
+  glDrawArrays(GL_POINT, 0, number_of_stars);
 }
 
 ///////////////////////////// update functions ////////////////////////////////
@@ -361,7 +376,11 @@ void update_view(GLFWwindow* window, int width, int height) {
      fixes the "bug" you can see in the W-key.mov */
   camera_projection = glm::perspective(fov_y, aspect, 0.1f, 1000.0f);
   // upload matrix to gpu
+  glUseProgram(simple_program);
   glUniformMatrix4fv(location_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
+
+  glUseProgram(starCloud_program);
+  glUniformMatrix4fv(starCloud_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
 }
 
 // update camera transformation
@@ -375,7 +394,11 @@ void update_camera() {
   */
   glm::mat4 inv_camera_view = glm::inverse(camera_view);
   // upload matrix to gpu
+  glUseProgram(simple_program);
   glUniformMatrix4fv(location_view_matrix, 1, GL_FALSE, glm::value_ptr(inv_camera_view));
+
+  glUseProgram(starCloud_program);
+  glUniformMatrix4fv(starCloud_view_matrix, 1,GL_FALSE, glm::value_ptr(inv_camera_view));
 }
 
 // load shaders and update uniform locations
@@ -420,6 +443,9 @@ void update_uniform_locations() {
   location_model_matrix = glGetUniformLocation(simple_program, "ModelMatrix");
   location_view_matrix = glGetUniformLocation(simple_program, "ViewMatrix");
   location_projection_matrix = glGetUniformLocation(simple_program, "ProjectionMatrix");
+
+  starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
+  starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
 }
 
 ///////////////////////////// misc functions ////////////////////////////////
