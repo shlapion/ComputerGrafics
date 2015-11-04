@@ -94,8 +94,8 @@ void update_camera();
 void update_uniform_locations();
 void update_shader_programs();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-void generate_solar_system();
-std::vector<float>  generate_starfield(int num_stars);
+void generate_solarSystem();
+std::vector<float>  generate_starCloud(int num_stars);
 void initialize_planet_geometry();
 void initialize_starfield_geometry();
 void show_fps();
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
 //	std::vector<float> starPosition;
 //	std::generate(starPosition.begin(), starPosition.end(), std::rand());
 
-    generate_solar_system();
+    generate_solarSystem();
 
     render();
 
@@ -203,7 +203,7 @@ struct Shader_Programm {
     GLuint* programm;
 };
 
-void generate_solar_system() {
+void generate_solarSystem() {
   Planet* sun = new Planet{"sun",0.0f,0.0f,10.90f,nullptr};
   Planet* mercury = new Planet{"mercury",0.4f*AU,2.0f,0.3829f,sun};
   Planet* venus = new Planet{"venus",0.7f*AU,2.0f,0.9499f,sun};
@@ -229,7 +229,7 @@ void generate_solar_system() {
   solarSystem.push_back(moon);
 }
 
-std::vector<float>  generate_starfield(int num_stars) {
+std::vector<float>  generate_starCloud(int num_stars) {
   std::vector<float> stars;
   for (int i=0;i<num_stars;i++) {
     float x = std::rand();
@@ -279,7 +279,8 @@ void initialize_planet_geometry() {
 
 
 void initialize_starfield_geometry() {
-  std::vector<float> starfield_data = generate_starfield(number_of_stars);
+  // it is a bit redundant with the initialize_planet_geometry()
+  std::vector<float> starfield_data = generate_starCloud(number_of_stars);
 
   star_model = {starfield_data, model::POSITION | model::NORMAL};
 
@@ -305,9 +306,9 @@ void initialize_starfield_geometry() {
   glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets.at(model::NORMAL));
 
   // generate generic buffer
-  glGenBuffers(1, &planet_object.element_BO);
+  glGenBuffers(1, &starfield_object.element_BO);
   // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planet_object.element_BO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, starfield_object.element_BO);
   // configure currently bound array buffer
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * star_model.indices.size(), star_model.indices.data(), GL_STATIC_DRAW);
 }
