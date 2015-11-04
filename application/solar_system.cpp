@@ -382,7 +382,7 @@ void update_shader_programs() {
     */
     std::vector<Shader_Programm> shaders;
   shaders.push_back({"shaders/simple.vert", "shaders/simple.frag", &simple_program});
-  shaders.push_back({"shaders/starCloud.vert","shaders/star/Cloud.frag", &starCloud_program});
+  shaders.push_back({"shaders/starCloud.vert","shaders/starCloud.frag", &starCloud_program});
 
   try {
     for (auto item : shaders) {
