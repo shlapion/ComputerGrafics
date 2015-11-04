@@ -33,6 +33,7 @@ using namespace gl;
 //Defina Astronomical Unit(AU) unit of length roughly equal to the distance from the earth to the sun 
 const float AU = 30.0f;
 const int number_of_stars = 10000;
+const int number_of_orbitFragment = 3600;
 
 /////////////////////////// variable definitions //////////////////////////////
 // vertical field of view of camera
@@ -52,10 +53,12 @@ unsigned frames_per_second = 0;
 // the main shader program
 GLuint simple_program = 0;
 GLuint starCloud_program = 0;
+GLuint orbit_program = 0;
 
 // cpu representation of model
 model planet_model{};
 model star_model{};
+model orbit_model{};
 
 // holds gpu representation of model
 struct model_object {
@@ -65,6 +68,7 @@ struct model_object {
 };
 model_object planet_object;
 model_object starfield_object;
+model_object orbit_object;
 
 // camera matrices
 glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 0.0f, 150.0f});
@@ -79,6 +83,11 @@ GLint location_projection_matrix = -1;
 // starClaud location
 GLint starCloud_view_matrix = -1;
 GLint starCloud_projection_matrix = -1;
+
+// orbit locations
+GLint orbit_model_matrix = -1;
+GLint orbit_view_matrix = -1;
+GLint orbit_projection_matrix = -1;
 
 // path to the resource folders
 std::string resource_path{};
@@ -96,6 +105,8 @@ void update_shader_programs();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void generate_solarSystem();
 void  generate_starCloud();
+void generate_orbits();
+
 model_object initialize_geometry( model & mod );
 
 void show_fps();
@@ -103,6 +114,7 @@ void render();
 //void render_planet();
 void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition);
 //void render_starfield();
+void render_orbit(Planet* const& planet);
 
 /////////////////////////////// main function /////////////////////////////////
 int main(int argc, char* argv[]) {
@@ -171,6 +183,7 @@ int main(int argc, char* argv[]) {
   // set up models
   generate_solarSystem();
   generate_starCloud();
+  generate_orbits();
 
   // enable depth testing
   glEnable(GL_DEPTH_TEST);
@@ -202,6 +215,7 @@ struct Shader_Programm {
     std::string frag_path;
     GLuint* programm;
 };
+
 
 void generate_solarSystem() {
   Planet* sun = new Planet{"sun",0.0f,0.0f,10.90f,nullptr};
@@ -250,6 +264,24 @@ void  generate_starCloud() {
   }
   star_model = {stars, model::POSITION | model::NORMAL};
   starfield_object = initialize_geometry(star_model);
+}
+
+void generate_orbits() {
+  std::vector<float> orbVec;
+  for (int i =0; i<number_of_orbitFragment;i++) {
+    float x = float (glm::cos( ( 360 / float (number_of_orbitFragment) * i ) * M_PI));
+    float y = 0.0f;
+    float z = float (glm::sin( ( 360 / float (number_of_orbitFragment) * i ) * M_PI));
+    orbVec.push_back(x);
+    orbVec.push_back(y);
+    orbVec.push_back(z);
+
+//    orbVec.push_back(0.2f);
+//    orbVec.push_back(0.2f);
+//    orbVec.push_back(0.2f);
+  }
+  orbit_model = {orbVec, model::POSITION|model::NORMAL};
+  orbit_object= initialize_geometry(orbit_model);
 }
 
 ///////////////////////// initialisation functions ////////////////////////////
@@ -305,6 +337,11 @@ void render() {
   }
   //render_planet();
 
+  glUseProgram(orbit_program);
+  for (auto const&p:solarSystem) {
+    render_orbit(p);
+  }
+
 }
 
 void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition) {
@@ -322,6 +359,14 @@ void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition) {
   utils::validate_program(simple_program);
   // draw bound vertex array as triangles using bound shader
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), (gl::GLenum) model::INDEX.type, NULL);
+}
+
+void render_orbit(Planet* const& planet) {
+  glm::mat4 model_matrix = glm::scale(glm::mat4{},glm::vec3{planet->distance()});
+  glUniformMatrix4fv(orbit_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
+  glBindVertexArray(orbit_object.vertex_AO);
+  utils::validate_program(orbit_program);
+  glDrawArrays(GL_LINES,0,number_of_orbitFragment);
 }
 
 ///////////////////////////// update functions ////////////////////////////////
@@ -350,6 +395,9 @@ void update_view(GLFWwindow* window, int width, int height) {
 
   glUseProgram(starCloud_program);
   glUniformMatrix4fv(starCloud_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
+
+  glUseProgram(orbit_program);
+  glUniformMatrix4fv(orbit_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
 }
 
 // update camera transformation
@@ -368,6 +416,9 @@ void update_camera() {
 
   glUseProgram(starCloud_program);
   glUniformMatrix4fv(starCloud_view_matrix, 1,GL_FALSE, glm::value_ptr(inv_camera_view));
+
+  glUseProgram(orbit_program);
+  glUniformMatrix4fv(orbit_view_matrix, 1, GL_FALSE,glm::value_ptr(inv_camera_view));
 }
 
 // load shaders and update uniform locations
@@ -379,6 +430,7 @@ void update_shader_programs() {
     std::vector<Shader_Programm> shaders;
   shaders.push_back({"shaders/simple.vert", "shaders/simple.frag", &simple_program});
   shaders.push_back({"shaders/starCloud.vert","shaders/starCloud.frag", &starCloud_program});
+  shaders.push_back({"shaders/orbit.vert","shaders/orbit.frag", &orbit_program});
 
   try {
     for (auto item : shaders) {
@@ -415,6 +467,10 @@ void update_uniform_locations() {
 
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
   starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
+
+  orbit_model_matrix = glGetUniformLocation(simple_program, "ModelMatrix");
+  orbit_view_matrix = glGetUniformLocation(simple_program, "ViewMatrix");
+  orbit_projection_matrix = glGetUniformLocation(simple_program, "ProjectionMatrix");
 }
 
 ///////////////////////////// misc functions ////////////////////////////////
@@ -477,6 +533,11 @@ void quit(int status) {
   glDeleteBuffers(1, &starfield_object.vertex_BO);
   glDeleteVertexArrays(1, &starfield_object.element_BO);
   glDeleteVertexArrays(1, &starfield_object.vertex_AO);
+
+  glDeleteProgram(orbit_program);
+  glDeleteBuffers(1, &orbit_object.vertex_BO);
+  glDeleteVertexArrays(1, &orbit_object.element_BO);
+  glDeleteVertexArrays(1, &orbit_object.vertex_AO);
 
   // free glfw resources
   glfwDestroyWindow(window);
