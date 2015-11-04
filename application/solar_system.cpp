@@ -15,6 +15,8 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
+
 #include "shader_loader.hpp"
 #include "model_loader.hpp"
 #include "texture_loader.hpp"
@@ -188,6 +190,9 @@ int main(int argc, char* argv[]) {
     solarSystem.push_back(neptun);
 
     solarSystem.push_back(moon);
+
+	std::vector<float> starPosition;
+	std::generate(starPosition.begin(), starPosition.end(), std::rand());
 
     // draw geometry
     for (auto & p: solarSystem) { // maybe better in renderer fro planets?
