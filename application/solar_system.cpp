@@ -95,9 +95,9 @@ void update_uniform_locations();
 void update_shader_programs();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void generate_solarSystem();
-std::vector<float>  generate_starCloud(int num_stars);
-void initialize_planet_geometry();
-void initialize_starfield_geometry();
+void  generate_starCloud();
+model_object initialize_geometry( model & mod );
+
 void show_fps();
 void render();
 //void render_planet();
@@ -169,8 +169,8 @@ int main(int argc, char* argv[]) {
   update_camera();
 
   // set up models
-  initialize_planet_geometry();
-  initialize_starfield_geometry();
+  generate_solarSystem();
+  generate_starCloud();
 
   // enable depth testing
   glEnable(GL_DEPTH_TEST);
@@ -186,7 +186,6 @@ int main(int argc, char* argv[]) {
 //	std::vector<float> starPosition;
 //	std::generate(starPosition.begin(), starPosition.end(), std::rand());
 
-    generate_solarSystem();
 
     render();
 
@@ -228,11 +227,16 @@ void generate_solarSystem() {
   solarSystem.push_back(neptun);
 
   solarSystem.push_back(moon);
+
+  planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
+  planet_object = initialize_geometry(planet_model);
 }
 
-std::vector<float>  generate_starCloud(int num_stars) {
+void  generate_starCloud() {
+  // dont need an returning value like this.
   std::vector<float> stars;
-  for (int i=0;i<num_stars;i++) {
+
+  for (int i=0;i<number_of_stars;i++) {
     float x = std::rand();
     float y = std::rand();
     float z = std::rand();
@@ -244,78 +248,44 @@ std::vector<float>  generate_starCloud(int num_stars) {
     stars.push_back(1.0f);
     stars.push_back(1.0f);
   }
-  return stars;
+  star_model = {stars, model::POSITION | model::NORMAL};
+  starfield_object = initialize_geometry(star_model);
 }
 
 ///////////////////////// initialisation functions ////////////////////////////
 // load models
-void initialize_planet_geometry() {
-  planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
- 
+model_object initialize_geometry( model & mod ) {
 
+  model_object object_;
   // generate vertex array object
-  glGenVertexArrays(1, &planet_object.vertex_AO);
+  glGenVertexArrays(1, &object_.vertex_AO);
   // bind the array for attaching buffers
-  glBindVertexArray(planet_object.vertex_AO);
+  glBindVertexArray(object_.vertex_AO);
 
   // generate generic buffer
-  glGenBuffers(1, &planet_object.vertex_BO);
+  glGenBuffers(1, &object_.vertex_BO);
   // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ARRAY_BUFFER, planet_object.vertex_BO);
+  glBindBuffer(GL_ARRAY_BUFFER, object_.vertex_BO);
   // configure currently bound array buffer
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * planet_model.data.size(), planet_model.data.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mod.data.size(), mod.data.data(), GL_STATIC_DRAW);
 
   // activate first attribute on gpu
   glEnableVertexAttribArray(0);
   // first attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(0, model::POSITION.components, (gl::GLenum) model::POSITION.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::POSITION]);
+  glVertexAttribPointer(0, model::POSITION.components, (gl::GLenum) model::POSITION.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::POSITION]);
   // activate second attribute on gpu
   glEnableVertexAttribArray(1);
   // second attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(1, model::NORMAL.components, (gl::GLenum) model::NORMAL.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::NORMAL]);
+  glVertexAttribPointer(1, model::NORMAL.components, (gl::GLenum) model::NORMAL.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::NORMAL]);
 
    // generate generic buffer
-  glGenBuffers(1, &planet_object.element_BO);
+  glGenBuffers(1, &object_.element_BO);
   // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planet_object.element_BO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_.element_BO);
   // configure currently bound array buffer
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * planet_model.indices.size(), planet_model.indices.data(), GL_STATIC_DRAW);
-}
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * mod.indices.size(), mod.indices.data(), GL_STATIC_DRAW);
 
-
-void initialize_starfield_geometry() {
-  // it is a bit redundant with the initialize_planet_geometry()
-  std::vector<float> starfield_data = generate_starCloud(number_of_stars);
-
-  star_model = {starfield_data, model::POSITION | model::NORMAL};
-
-  // generate vertex array object
-  glGenVertexArrays(1, &starfield_object.vertex_AO);
-  // bind the array for attaching buffers
-  glBindVertexArray(starfield_object.vertex_AO);
-
-  // generate generic buffer
-  glGenBuffers(1, &starfield_object.vertex_BO);
-  // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ARRAY_BUFFER, starfield_object.vertex_BO);
-  // configure currently bound array buffer
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * star_model.data.size(), star_model.data.data(), GL_STATIC_DRAW);
-
-  // activate first attribute on gpu
-  glEnableVertexAttribArray(0);
-  // first attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::POSITION]);
-
-  glEnableVertexAttribArray(1);
-  // second attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets.at(model::NORMAL));
-
-  // generate generic buffer
-  glGenBuffers(1, &starfield_object.element_BO);
-  // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, starfield_object.element_BO);
-  // configure currently bound array buffer
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * star_model.indices.size(), star_model.indices.data(), GL_STATIC_DRAW);
+  return object_;
 }
 
 
@@ -323,10 +293,10 @@ void initialize_starfield_geometry() {
 // render model
 //Actual size of the planets referenced to the earth.
 void render() {
-/*  glUseProgram(starCloud_program);
+  glUseProgram(starCloud_program);
   glBindVertexArray(starfield_object.vertex_AO);
   utils::validate_program(starCloud_program);
-  glDrawArrays(GL_POINT, 0, number_of_stars);*/
+  glDrawArrays(GL_POINT, 0, number_of_stars);
 
 
   glUseProgram(simple_program);
