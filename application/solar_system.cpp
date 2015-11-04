@@ -83,7 +83,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void initialize_geometry();
 void show_fps();
 void render();
-void render(Planet const&, glm::mat4 const&);
+void render(Planet* const&, glm::mat4 const&);
 
 /////////////////////////////// main function /////////////////////////////////
 int main(int argc, char* argv[]) {
@@ -163,22 +163,44 @@ int main(int argc, char* argv[]) {
     // clear buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    std::vector<Planet> solarSystem;
+    std::vector<Planet*> solarSystem;
 
-    solarSystem.push_back(Planet{"sun",0.0f,0.0f,10.90f});
-    solarSystem.push_back(Planet{"mercury",0.4f*AU,2.0f,0.3829f});
-    solarSystem.push_back(Planet{"venus",0.7f*AU,2.0f,0.9499f});
-    solarSystem.push_back(Planet{"earth",AU,1.0f,1.0f});
-    solarSystem.push_back(Planet{"mars",1.5f*AU,1.0f,0.533f});
-    solarSystem.push_back(Planet{"jupiter",3.2f*AU,0.8f,6.0f});
-    solarSystem.push_back(Planet{"saturn",5.5f*AU,0.7f,5.0f});
-    solarSystem.push_back(Planet{"uranus",19.2f*AU,0.5f,3.929f});
-    solarSystem.push_back(Planet{"neptun",18.0f*AU,0.4f,3.883f});
+    Planet* sun = new Planet{"sun",0.0f,0.0f,10.90f,nullptr};
+    Planet* mercury = new Planet{"mercury",0.4f*AU,2.0f,0.3829f,sun};
+    Planet* venus = new Planet{"venus",0.7f*AU,2.0f,0.9499f,sun};
+    Planet* earth = new Planet{"earth",AU,1.0f,1.0f,sun};
+    Planet* mars = new Planet{"mars",1.5f*AU,1.0f,0.533f,sun};
+    Planet* jupiter = new Planet{"jupiter",3.2f*AU,0.8f,6.0f,sun};
+    Planet* saturn = new Planet{"saturn",5.5f*AU,0.7f,5.0f,sun};
+    Planet* uranus = new Planet{"uranus",19.2f*AU,0.5f,3.929f,sun};
+    Planet* neptun = new Planet{"neptun",18.0f*AU,0.4f,3.883f,sun};
 
+    Planet* moon = new Planet{"moon",0.1f*AU,3.0f,0.273f,earth};
+
+    solarSystem.push_back(sun);
+    solarSystem.push_back(mercury);
+    solarSystem.push_back(venus);
+    solarSystem.push_back(earth);
+    solarSystem.push_back(mars);
+    solarSystem.push_back(jupiter);
+    solarSystem.push_back(saturn);
+    solarSystem.push_back(uranus);
+    solarSystem.push_back(neptun);
+
+    solarSystem.push_back(moon);
 
     // draw geometry
-    for (auto const& p:solarSystem) {
-      render(p,glm::mat4{});
+    for (auto & p: solarSystem) { // maybe better in renderer fro planets?
+      glm::vec3 position;
+      float time = glfwGetTime();
+      Planet* current = p;
+      while (current != nullptr) { // maybe better in renderer. Interesting moonaction....
+        position.x += glm::cos(time * current->speed()) * current->distance();
+        position.y += glm::sin(time * current->speed()) * current->distance();
+        current = current->child();
+      }
+      glm::mat4 translated_position = glm::translate(glm::mat4(),position);
+      render(p,translated_position);
     }
     // swap draw buffer to front
     glfwSwapBuffers(window);
@@ -378,11 +400,11 @@ glm::mat4 sunSize = glm::scale(glm::mat4{}, glm::vec3{10.90f});  // scaled down
  
 }
 
-void render(Planet const& planet, glm::mat4 const& parentPosition) {
+void render(Planet* const& planet, glm::mat4 const& parentPosition) {
 
-  glm::mat4 model_matrix = glm::rotate(parentPosition, float(glfwGetTime()*planet.speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet.distance() }); // radius of the rotation axis defined in AU
-  model_matrix = glm::scale(model_matrix, glm::vec3{planet.size()});
+  glm::mat4 model_matrix = glm::rotate(parentPosition, float(glfwGetTime()*planet->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance() }); // radius of the rotation axis defined in AU
+  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size()});
   
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface

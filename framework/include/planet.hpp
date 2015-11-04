@@ -45,12 +45,17 @@ public:
         return child_ != nullptr;
     }
 
+    Planet* child() const { //whhaaa
+        return child_;
+    }
+
 private:
     std::string name_;
     float distance_; // to the sun? [0,0,0] --> z
     // Winkel, Höhenwinkel, Azimut? https://de.wikipedia.org/wiki/Azimut
     float speed_;
     float size_;
+    float mass_;
     Planet* child_; // there could be more than one moon... hmm. maybe better perant?!!
     Planet* parent_;
     //position --> time, rotation
