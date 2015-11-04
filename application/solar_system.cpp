@@ -22,7 +22,6 @@
 #include "texture_loader.hpp"
 #include "utils.hpp"
 #include "planet.hpp"
-#include "Shader_Programm.hpp"
 
 #include <cstdlib>
 #include <iostream>
@@ -193,6 +192,12 @@ int main(int argc, char* argv[]) {
   quit(EXIT_SUCCESS);
 }
 
+struct Shader_Programm {
+    std::string vertex_path;
+    std::string frag_path;
+    GLuint* programm;
+};
+
 void generate_solar_system() {
   Planet* sun = new Planet{"sun",0.0f,0.0f,10.90f,nullptr};
   Planet* mercury = new Planet{"mercury",0.4f*AU,2.0f,0.3829f,sun};
@@ -301,10 +306,10 @@ void render() {
 
 void render_planet() {
   // draw geometry
-  for (auto & p: solarSystem) { // maybe better in renderer fro planets?
+  for (auto p: solarSystem) { // maybe better in renderer fro planets?
     glm::vec3 position;
-    glm::vec3 transformation;
-    glm::vec3 normal_transformation;
+    glm::mat4 transformation;
+    glm::mat4 normal_transformation;
 
     float time = glfwGetTime();
     Planet* current = p;
@@ -313,16 +318,15 @@ void render_planet() {
       position.y += glm::sin(time * current->speed()) * current->distance();
       current = current->child();
     }
-    glm::mat4 translated_position = glm::translate(glm::mat4(),position);
+    transformation = glm::translate(transformation,position);
+    transformation = glm::scale(transformation,glm::vec3 {current->size()});
 
-    glm::mat4 model_matrix = glm::rotate(translated_position, float(glfwGetTime()*current->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-    model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, current->distance() }); // radius of the rotation axis defined in AU
-    model_matrix = glm::scale(model_matrix, glm::vec3{current->size()});
+//    glm::mat4 model_matrix = glm::rotate(transformation, float(glfwGetTime()*current->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
 
-    glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
+    glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(transformation));
     // extra matrix for normal transformation to keep them orthogonal to surface
-    glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view) * model_matrix);
-    glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
+    normal_transformation = glm::inverseTranspose(glm::inverse(camera_view) * transformation);
+    glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_transformation));
 
     glBindVertexArray(planet_object.vertex_AO);
     utils::validate_program(simple_program);
