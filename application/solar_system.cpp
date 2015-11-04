@@ -301,6 +301,9 @@ void render_planet() {
   // draw geometry
   for (auto & p: solarSystem) { // maybe better in renderer fro planets?
     glm::vec3 position;
+    glm::vec3 transformation;
+    glm::vec3 normal_transformation;
+
     float time = glfwGetTime();
     Planet* current = p;
     while (current != nullptr) { // maybe better in renderer. Interesting moonaction....
