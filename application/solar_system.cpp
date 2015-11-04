@@ -310,8 +310,8 @@ void render() {
 
 void render_planet() {
   glUseProgram(simple_program);
-  update_camera();
-  update_uniform_locations();
+  update_shader_programs();
+
 
   // draw geometry
   for (auto p: solarSystem) { // maybe better in renderer fro planets?
@@ -347,7 +347,7 @@ void render_planet() {
 void render_starfield() {
   glUseProgram(starCloud_program);
   update_shader_programs();
-  update_camera();
+
 
 
   glBindVertexArray(starfield_object.vertex_AO);
@@ -423,7 +423,7 @@ void update_shader_programs() {
       // bind shader
       glUseProgram(*item.programm);
       // after shader is recompiled uniform locations may change
-      update_uniform_locations();
+      //update_uniform_locations();
 
       // upload view uniforms to new shader
       int width, height;
@@ -444,8 +444,8 @@ void update_uniform_locations() {
   location_view_matrix = glGetUniformLocation(simple_program, "ViewMatrix");
   location_projection_matrix = glGetUniformLocation(simple_program, "ProjectionMatrix");
 
-  starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
+  starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
 }
 
 ///////////////////////////// misc functions ////////////////////////////////
@@ -457,52 +457,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
   else if(key == GLFW_KEY_R && action == GLFW_PRESS) {
     update_shader_programs();
   }
-  else if(key == GLFW_KEY_W && action == GLFW_PRESS) {
+  else if(key == GLFW_KEY_W && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
     camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
   }
-  else if(key == GLFW_KEY_S && action == GLFW_PRESS) {
+  else if(key == GLFW_KEY_S && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
     camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU});
     update_camera();
   }
-  else if(key == GLFW_KEY_UP && action == GLFW_PRESS) {
+  else if(key == GLFW_KEY_UP && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
       camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f*AU, 0.0f});
       update_camera();
   }
-  else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+  else if(key == GLFW_KEY_DOWN && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
       camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f*AU, 0.0f});
       update_camera();
   }
-  else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+  else if(key == GLFW_KEY_RIGHT && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
       camera_view = glm::translate(camera_view, glm::vec3{0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
-  else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-      camera_view = glm::translate(camera_view, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
-      update_camera();
-  }
-    
-  else if(key == GLFW_KEY_W && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, -0.1f*AU});
-      update_camera();
-  }
-  else if(key == GLFW_KEY_S && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU});
-      update_camera();
-  }
-  else if(key == GLFW_KEY_UP && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.1f*AU, 0.0f});
-      update_camera();
-  }
-  else if(key == GLFW_KEY_DOWN && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.0f, -0.1f*AU, 0.0f});
-      update_camera();
-  }
-  else if(key == GLFW_KEY_RIGHT && action == GLFW_REPEAT) {
-      camera_view = glm::translate(camera_view, glm::vec3{0.1f*AU, 0.0f, 0.0f});
-      update_camera();
-  }
-  else if(key == GLFW_KEY_LEFT && action == GLFW_REPEAT) {
+  else if(key == GLFW_KEY_LEFT && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
       camera_view = glm::translate(camera_view, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
       update_camera();
   }
