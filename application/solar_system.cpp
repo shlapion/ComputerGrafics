@@ -55,7 +55,8 @@ GLuint starCloud_program = 0;
 
 // cpu representation of model
 model planet_model{};
-model sun{};
+model star_model{};
+
 // holds gpu representation of model
 struct model_object {
   GLuint vertex_AO = 0;
@@ -280,6 +281,7 @@ void initialize_planet_geometry() {
 void initialize_starfield_geometry() {
   std::vector<float> starfield_data = generate_starfield(number_of_stars);
 
+  star_model = {starfield_data, model::POSITION | model::NORMAL};
 
   // generate vertex array object
   glGenVertexArrays(1, &starfield_object.vertex_AO);
@@ -291,12 +293,23 @@ void initialize_starfield_geometry() {
   // bind this as an vertex array buffer containing all attributes
   glBindBuffer(GL_ARRAY_BUFFER, starfield_object.vertex_BO);
   // configure currently bound array buffer
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * starfield_data.size(), starfield_data.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * star_model.data.size(), star_model.data.data(), GL_STATIC_DRAW);
 
   // activate first attribute on gpu
   glEnableVertexAttribArray(0);
   // first attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, planet_model.vertex_bytes, planet_model.offsets[model::POSITION]);
+  glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets[model::POSITION]);
+
+  glEnableVertexAttribArray(1);
+  // second attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, star_model.vertex_bytes, star_model.offsets.at(model::NORMAL));
+
+  // generate generic buffer
+  glGenBuffers(1, &planet_object.element_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, planet_object.element_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * star_model.indices.size(), star_model.indices.data(), GL_STATIC_DRAW);
 }
 
 
