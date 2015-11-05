@@ -330,10 +330,10 @@ model_object initialize_geometry( model & mod ) {
 // render model
 //Actual size of the planets referenced to the earth.
 void render() {
-/*  glUseProgram(starCloud_program);
+  glUseProgram(starCloud_program);
   glBindVertexArray(starfield_object.vertex_AO);
   utils::validate_program(starCloud_program);
-  glDrawArrays(GL_POINT, 0, number_of_stars);*/
+  glDrawArrays(GL_POINTS, 0, number_of_stars);
 
 
   glUseProgram(simple_program);
