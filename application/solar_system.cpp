@@ -33,7 +33,7 @@ using namespace gl;
 //Defina Astronomical Unit(AU) unit of length roughly equal to the distance from the earth to the sun 
 const float AU = 30.0f;
 const int number_of_stars = 10000;
-const int number_of_orbitFragment = 3600;
+const int number_of_orbitFragment = 36000;
 
 /////////////////////////// variable definitions //////////////////////////////
 // vertical field of view of camera
@@ -71,7 +71,7 @@ model_object starfield_object;
 model_object orbit_object;
 
 // camera matrices
-glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 0.0f, 150.0f});
+glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 30.0f, 150.0f});
 glm::mat4 camera_projection{1.0f};
 
 // uniform locations
@@ -218,15 +218,16 @@ struct Shader_Programm {
 
 
 void generate_solarSystem() {
-  Planet* sun = new Planet{"sun",0.0f,0.0f,10.90f,nullptr};
-  Planet* mercury = new Planet{"mercury",0.4f*AU,2.0f,0.3829f,sun};
-  Planet* venus = new Planet{"venus",0.7f*AU,2.0f,0.9499f,sun};
-  Planet* earth = new Planet{"earth",AU,1.0f,1.0f,sun};
-  Planet* mars = new Planet{"mars",1.5f*AU,1.0f,0.533f,sun};
-  Planet* jupiter = new Planet{"jupiter",3.2f*AU,0.8f,6.0f,sun};
-  Planet* saturn = new Planet{"saturn",5.5f*AU,0.7f,5.0f,sun};
-  Planet* uranus = new Planet{"uranus",19.2f*AU,0.5f,3.929f,sun};
-  Planet* neptun = new Planet{"neptun",18.0f*AU,0.4f,3.883f,sun};
+    //                         name,  distance,  speed, size, * child
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,10.90f,nullptr};
+  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,sun};
+  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,sun};
+  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,sun};
+  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,sun};
+  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,sun};
+  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,sun};
+  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,sun};
+  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,sun};
 
   Planet* moon = new Planet{"moon",0.1f*AU,3.0f,0.273f,earth};
 
@@ -336,8 +337,10 @@ void render() {
     float time =glfwGetTime();
     Planet* current = p;
     glm::mat4 translation;
+    glm::vec3 position;
     while (current != nullptr) {
-//      translation = glm::scale(translation, glm::vec3{p->size()});
+//
+//    translation = glm::scale(translation, glm::vec3{p->size()});
       translation = glm::rotate(translation,time * p->speed(), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
       translation = glm::translate(translation, glm::vec3{ 0.0f, 0.0f, p->distance() }); // radius of the rotation axis defined in AU
       current = current->child();
@@ -373,7 +376,7 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
 }
 
 void render_orbit(Planet* const& planet) {
-  glm::mat4 model_matrix = glm::scale(glm::mat4{},glm::vec3{planet->distance()});
+  glm::mat4 model_matrix = glm::scale(glm::mat4{},glm::vec3{planet->distance()+planet->size()});
   glUniformMatrix4fv(orbit_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   glBindVertexArray(orbit_object.vertex_AO);
   utils::validate_program(orbit_program);
