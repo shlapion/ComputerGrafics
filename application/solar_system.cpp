@@ -14,6 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm>
 #include <cmath>
 
 
@@ -118,7 +119,7 @@ void render();
 //void render_planet();
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time);
 //void render_starfield();
-void render_orbit(Planet* const& planet);
+void render_orbit(Planet* const& planet, float delta);
 
 /////////////////////////////// main function /////////////////////////////////
 int main(int argc, char* argv[]) {
@@ -223,7 +224,7 @@ struct Shader_Programm {
 
 void generate_solarSystem() {
     //                         name,  distance,  speed, size, * child
-  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,10.90f,nullptr};
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f,nullptr};
   Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,sun};
   Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,sun};
   Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,sun};
@@ -256,9 +257,9 @@ void  generate_starCloud() {
   std::vector<float> stars;
 
   for (int i=0;i<number_of_stars;i++) {
-    float x = fmod(std::rand() , 100*AU)-50*AU;
-    float y = fmod(std::rand() , 100*AU)-50*AU;
-    float z = fmod(std::rand() , 100*AU)-50*AU;
+    float x = float(fmod(std::rand() , 100*AU)-50*AU);
+    float y = float(fmod(std::rand() , 100*AU)-50*AU);
+    float z = float(fmod(std::rand() , 100*AU)-50*AU);
     stars.push_back(x);
     stars.push_back(y);
     stars.push_back(z);
@@ -337,8 +338,9 @@ void render() {
 
 
   glUseProgram(simple_program);
+  std::reverse(solarSystem.begin(), solarSystem.end());
   for (auto const &p : solarSystem) {
-    float time =glfwGetTime();
+    float time = float(glfwGetTime());
     Planet* current = p;
     glm::mat4 translation;
     glm::vec3 position;
@@ -357,20 +359,26 @@ void render() {
 
   glUseProgram(orbit_program);
   for (auto const&p:solarSystem) {
-    render_orbit(p);
+    Planet* current = p;
+    float deltaDistance;
+    while (current!= nullptr) {
+      deltaDistance += current->size();
+      current=current->child();
+    }
+    render_orbit(p, deltaDistance);
   }
 
 }
 
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
-
+  glUseProgram(simple_program);
   model_matrix = glm::scale(model_matrix, glm::vec3{planet->size()});
   model_matrix = glm::rotate(model_matrix,time * planet->speed(), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance() }); // radius of the rotation axis defined in AU
 
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::mat4 normal_matrix = glm::inverseTranspose(camera_view * model_matrix);
+  glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view * model_matrix));
   glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 
   glBindVertexArray(planet_object.vertex_AO);
@@ -379,8 +387,8 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), (gl::GLenum) model::INDEX.type, NULL);
 }
 
-void render_orbit(Planet* const& planet) {
-  glm::mat4 model_matrix = glm::scale(glm::mat4{},glm::vec3{planet->distance()+planet->size()});
+void render_orbit(Planet* const& planet, float delta) {
+  glm::mat4 model_matrix = glm::scale(glm::mat4{},glm::vec3{planet->distance()+delta});
   glUniformMatrix4fv(orbit_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   glBindVertexArray(orbit_object.vertex_AO);
   utils::validate_program(orbit_program);
