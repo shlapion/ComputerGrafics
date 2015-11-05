@@ -112,7 +112,7 @@ model_object initialize_geometry( model & mod );
 void show_fps();
 void render();
 //void render_planet();
-void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition);
+void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time);
 //void render_starfield();
 void render_orbit(Planet* const& planet);
 
@@ -333,7 +333,16 @@ void render() {
 
   glUseProgram(simple_program);
   for (auto const &p : solarSystem) {
-    render_Planet(p, glm::mat4{});
+    float time =glfwGetTime();
+    Planet* current = p;
+    glm::mat4 translation;
+    while (current != nullptr) {
+//      translation = glm::scale(translation, glm::vec3{p->size()});
+      translation = glm::rotate(translation,time * p->speed(), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+      translation = glm::translate(translation, glm::vec3{ 0.0f, 0.0f, p->distance() }); // radius of the rotation axis defined in AU
+      current = current->child();
+    }
+    render_Planet(p, translation, time);
   }
 
 
@@ -346,10 +355,10 @@ void render() {
 
 }
 
-void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition) {
+void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
 
-  glm::mat4 model_matrix = glm::scale(parentPosition, glm::vec3{planet->size()});
-  model_matrix = glm::rotate(model_matrix, float(glfwGetTime()*planet->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size()});
+  model_matrix = glm::rotate(model_matrix,time * planet->speed(), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance() }); // radius of the rotation axis defined in AU
 
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
