@@ -361,10 +361,10 @@ void render() {
   for (auto const&p:solarSystem) {
     Planet* current = p;
     float deltaDistance;
-    while (current!= nullptr) {
-      deltaDistance += current->size();
-      current=current->child();
-    }
+//    while (current!= nullptr) {
+//      deltaDistance += current->size();
+//      current=current->child();
+//    }
     render_orbit(p, deltaDistance);
   }
 
