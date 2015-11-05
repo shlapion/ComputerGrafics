@@ -14,6 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <cmath>
 
 
 
@@ -34,6 +35,9 @@ using namespace gl;
 const float AU = 30.0f;
 const int number_of_stars = 10000;
 const int number_of_orbitFragment = 36000;
+#ifndef M_PI
+  #define M_PI 3.14f
+#endif
 
 /////////////////////////// variable definitions //////////////////////////////
 // vertical field of view of camera
