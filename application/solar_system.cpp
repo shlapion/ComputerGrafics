@@ -335,6 +335,8 @@ void render() {
   for (auto const &p : solarSystem) {
     render_Planet(p, glm::mat4{});
   }
+
+
   //render_planet();
 
   glUseProgram(orbit_program);
@@ -346,9 +348,9 @@ void render() {
 
 void render_Planet(Planet* const& planet, glm::mat4 const& parentPosition) {
 
-  glm::mat4 model_matrix = glm::rotate(parentPosition, float(glfwGetTime()*planet->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  glm::mat4 model_matrix = glm::scale(parentPosition, glm::vec3{planet->size()});
+  model_matrix = glm::rotate(model_matrix, float(glfwGetTime()*planet->speed()), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance() }); // radius of the rotation axis defined in AU
-  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size()});
 
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
