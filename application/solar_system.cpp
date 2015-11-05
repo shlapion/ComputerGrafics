@@ -256,9 +256,9 @@ void  generate_starCloud() {
   std::vector<float> stars;
 
   for (int i=0;i<number_of_stars;i++) {
-    float x = std::rand();
-    float y = std::rand();
-    float z = std::rand();
+    float x = fmod(std::rand() , 100*AU)-50*AU;
+    float y = fmod(std::rand() , 100*AU)-50*AU;
+    float z = fmod(std::rand() , 100*AU)-50*AU;
     stars.push_back(x);
     stars.push_back(y);
     stars.push_back(z);
