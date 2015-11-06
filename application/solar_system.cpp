@@ -223,18 +223,19 @@ struct Shader_Programm {
 
 
 void generate_solarSystem() {
-    //                         name,  distance,  speed, size, * child
-  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f,nullptr};
+  Planet* moon;
+    //                         name,  distance,  speed, size, * parent, * child
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
   Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,sun};
   Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,sun};
-  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,sun};
+  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,sun, moon};
   Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,sun};
   Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,sun};
   Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,sun};
   Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,sun};
   Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,sun};
 
-  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,0.273f,earth};
+  moon = new Planet{"moon",0.1f*AU,3.0f,0.273f,earth};
 
   solarSystem.push_back(sun);
   solarSystem.push_back(mercury);
@@ -247,6 +248,19 @@ void generate_solarSystem() {
   solarSystem.push_back(neptun);
 
   solarSystem.push_back(moon);
+
+  float accumulatedSize = 0.0f;
+  for (auto p:solarSystem) {
+    if (p->is_root()) {
+      // it is sun
+      accumulatedSize = p->size();
+    }else if (!p->is_moon()) {
+      p->distance(accumulatedSize);
+      accumulatedSize += p->size();
+      std::cout << p->name() << ": " << p->distance() << " next will be " << accumulatedSize << std::endl;
+    }
+  }
+
 
   planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
   planet_object = initialize_geometry(planet_model);
@@ -344,13 +358,7 @@ void render() {
     Planet* current = p;
     glm::mat4 translation;
     glm::vec3 position;
-    while (current != nullptr) {
-//
-//    translation = glm::scale(translation, glm::vec3{p->size()});
-      translation = glm::rotate(translation,time * p->speed(), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-      translation = glm::translate(translation, glm::vec3{ 0.0f, 0.0f, p->distance() }); // radius of the rotation axis defined in AU
-      current = current->child();
-    }
+
     render_Planet(p, translation, time);
   }
 
@@ -359,13 +367,15 @@ void render() {
 
   glUseProgram(orbit_program);
   for (auto const&p:solarSystem) {
-    Planet* current = p;
-    float deltaDistance;
+//    Planet* current = p;
+    if (p->is_moon()) {
+      float deltaDistance = p->distance(); // delta+distance instead of inside the renderer provide flickering...
 //    while (current!= nullptr) {
-//      deltaDistance += current->size();
+//      //deltaDistance += current->size();
 //      current=current->child();
 //    }
-    render_orbit(p, deltaDistance);
+      render_orbit(p, deltaDistance);
+    }
   }
 
 }
@@ -388,7 +398,7 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
 }
 
 void render_orbit(Planet* const& planet, float delta) {
-  glm::mat4 model_matrix = glm::scale(glm::mat4{},glm::vec3{planet->distance()+delta});
+  glm::mat4 model_matrix = glm::scale(glm::mat4{},glm::vec3{delta});
   glUniformMatrix4fv(orbit_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   glBindVertexArray(orbit_object.vertex_AO);
   utils::validate_program(orbit_program);

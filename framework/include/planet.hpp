@@ -17,20 +17,30 @@ public:
             distance_{(distance>0.0f)?distance:-1.0f},
             speed_{(speed>0.0f)?speed:-1.0f},
             size_{(size>0.0f)?size:-1.0f},
-            child_{nullptr},
-            parent_{nullptr}
+            type_{"sun"}
     { };
-    Planet(std::string name, float distance, float speed, float size, Planet* child) :
+    Planet(std::string name, float distance, float speed, float size, std::string const& type) :
+    /* types are: sun as root Object, planet and moon (moons are around a planet)
+     * a moon need a pointer (name) to the planet.
+     */
             name_{name},
             distance_{(distance>0.0f)?distance:-1.0f},
             speed_{(speed>0.0f)?speed:-1.0f},
             size_{(size>0.0f)?size:-1.0f},
-            child_{child},
-            parent_{nullptr}
+            type_{(type=="sun"||type=="moon"||type=="planet")?type:"error_type"}
     { };
+
+
+    std::string name() const {
+        return name_;
+    }
 
     float distance() const {
         return distance_;
+    }
+
+    void distance(float value) {
+        distance_=value;
     }
 
     float speed() const {
@@ -41,13 +51,29 @@ public:
         return size_;
     }
 
-    bool hasMoon() const {
-        return child_ != nullptr;
+    std::string type() const {
+        return type_;
     }
 
-    Planet* child() const { //whhaaa
-        return child_;
+    bool is_moon() const {
+        return type_ == "moon";
     }
+
+    bool is_root() const {
+        return type_=="root";
+    }
+
+    bool is_planet() const {
+        return type_=="planet";
+    }
+
+//    Planet* child() const { //whhaaa
+//        return child_;
+//    }
+
+//    Planet* parent() const { //whhaaa
+//        return parent_;
+//    }
 
 private:
     std::string name_;
@@ -56,8 +82,9 @@ private:
     float speed_;
     float size_;
     float mass_;
-    Planet* child_; // there could be more than one moon... hmm. maybe better perant?!!
-    Planet* parent_;
+    std::string type_;
+//    Planet* child_; // there could be more than one moon... hmm. maybe better perant?!!
+//    Planet* parent_;
     //position --> time, rotation
     //transformationMatrix
     //inverTransposedMatrix
