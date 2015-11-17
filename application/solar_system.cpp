@@ -576,7 +576,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
     update_camera();
   }
-  else if((key == GLFW_KEY_Y) && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
+  else if((key == GLFW_KEY_Y | key==GLFW_KEY_Z) && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
     std::cout << print(camera_view);
     camera_view = glm::rotate(camera_view, 0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
