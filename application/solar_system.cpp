@@ -309,9 +309,9 @@ void generate_orbits() {
     orbVec.push_back(y);
     orbVec.push_back(z);
 
-//    orbVec.push_back(0.2f);
-//    orbVec.push_back(0.2f);
-//    orbVec.push_back(0.2f);
+    orbVec.push_back(0.2f);
+    orbVec.push_back(0.2f);
+    orbVec.push_back(0.2f);
   }
   orbit_model = {orbVec, model::POSITION|model::NORMAL};
   orbit_object= initialize_geometry(orbit_model);
