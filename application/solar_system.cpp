@@ -121,6 +121,18 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time);
 //void render_starfield();
 void render_orbit(Planet* const& planet, float delta);
 
+
+std::string print(glm::mat4 mat) {
+  std::string os ="\n{ ";
+  for (int i=0; i<=3; i++) {
+    for (int j=0; j<=3; j++) {
+      if (i==0 & j==0) os+="\n[ ";
+      os+=std::to_string(mat[i][j]);
+      if (i==3) os+=" ]"; else os+=" ;";
+    }
+  }
+  return os+" }";
+};
 /////////////////////////////// main function /////////////////////////////////
 int main(int argc, char* argv[]) {
 
@@ -236,12 +248,12 @@ void generate_solarSystem() {
   Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,"planet"};
 
   // generate moon and add them
-  Planet* moon = new Planet{"moon",0.01f*AU,3.0f,1.273f,"moon"};
+  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,1.273f,"moon"};
   earth->moon.push_back(moon);
   mars->moon.push_back(moon);
 
   // add planets to solar System
-  solarSystem.push_back(sun);
+  //solarSystem.push_back(sun);
   solarSystem.push_back(mercury);
   solarSystem.push_back(venus);
   solarSystem.push_back(earth);
@@ -257,7 +269,7 @@ void generate_solarSystem() {
       // it is sun
       accumulatedSize = p->size/2; // half size of the sun
     }else if (p->is_planet()) {
-      p->distance+=accumulatedSize; // every planets distance is given by the surface distance
+      p->distance+=accumulatedSize + p->size; // every planets distance is given by the surface distance
       //accumulatedSize += p->size;   // add the full size of the planet
       // we dont need the size of each planet. the distance is given by sun surface to planet surface.
       std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
@@ -353,7 +365,9 @@ void render() {
 
 
   glUseProgram(planet_program);
-
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
+  glm::mat4 translation_sun{};
+  render_Planet(sun,translation_sun,0);
   for (auto const &p : solarSystem) {
     float time = float(glfwGetTime());
     Planet* current = p;
@@ -368,7 +382,8 @@ void render() {
 
   glUseProgram(orbit_program);
   for (auto const&p:solarSystem) {
-      float deltaDistance = 0.0f;
+      float deltaDistance = p->distance - (p->size/2);
+      // p isnt needed at the moment.
       render_orbit(p, deltaDistance);
   }
 
@@ -379,7 +394,7 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   model_matrix = glm::scale(model_matrix, glm::vec3{planet->size});
   model_matrix = glm::rotate(model_matrix,time * planet->speed, glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance }); // radius of the rotation axis defined in AU
-
+  if (planet->name == "sun") std::cout <<  planet->name << " " << print(model_matrix) << std::endl;
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view * model_matrix));
@@ -491,7 +506,7 @@ void update_shader_programs() {
     update_camera();
   }
   catch(std::exception&) {
-    // dont crash, allow another try
+    // don't crash, allow another try
   }
 }
 
