@@ -213,9 +213,6 @@ int main(int argc, char* argv[]) {
     // clear buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//	std::vector<float> starPosition;
-//	std::generate(starPosition.begin(), starPosition.end(), std::rand());
-
 
     render();
 
@@ -280,7 +277,6 @@ void generate_solarSystem() {
 }
 
 void  generate_starCloud() {
-  // don't need an returning value like this.
   std::vector<float> stars;
 
   for (int i=0;i<number_of_stars;i++) {
