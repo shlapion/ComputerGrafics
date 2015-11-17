@@ -253,7 +253,7 @@ void generate_solarSystem() {
   mars->moon.push_back(moon);
 
   // add planets to solar System
-  //solarSystem.push_back(sun);
+  solarSystem.push_back(sun);
   solarSystem.push_back(mercury);
   solarSystem.push_back(venus);
   solarSystem.push_back(earth);
@@ -364,9 +364,9 @@ void render() {
 
 
   glUseProgram(planet_program);
-  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
-  glm::mat4 translation_sun{};
-  render_Planet(sun,translation_sun,0);
+//  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
+//  glm::mat4 translation_sun{};
+//  render_Planet(sun,translation_sun,0);
   for (auto const &p : solarSystem) {
     float time = float(glfwGetTime());
     Planet* current = p;
@@ -390,10 +390,10 @@ void render() {
 
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
   glUseProgram(planet_program);
-  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size});
   model_matrix = glm::rotate(model_matrix,time * planet->speed, glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance }); // radius of the rotation axis defined in AU
-  if (planet->name == "sun") std::cout <<  planet->name << " " << print(model_matrix) << std::endl;
+  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size});
+  //if (planet->name == "sun") std::cout <<  planet->name << " " << print(model_matrix) << std::endl;
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
   glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view * model_matrix));
