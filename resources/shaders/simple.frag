@@ -1,26 +1,39 @@
 #version 150
 
-
-in vec4 v; 
-
 in  vec4 pass_Normal;
+
+in vec3 normalInt;
+in vec3 vertPos;
+
 out vec4 out_Color;
 
+const vec3 lightPos = vec3(0.0,0.0,0.0);
+const vec3 ambientColor = vec3(0.1, 0.0, 0.0);
+const vec3 diffuseColor = vec3(0.5, 0.0, 0.0);
+const vec3 specColor = vec3(1.0, 1.0, 1.0);
+const float shininess = 16.0;
+const float screenGamma = 2.2;
+
 void main(void)
-{
-	
-	vec3 L = normalize(gl_LightSource[0].position.xyz - v);
-	vec3 E = normalize(-v);
-	vec3 R = normalize(-reflect(L,pass_Normal));
+{	
+	vec3 normal = normalize(normalInt);
+	vec3 lightDir = normalize(lightPos - vertPos);
 
-	vec3 ambient = gl_FrontLightProduct[0].ambient;
+	float lambertian = max(dot(lightDir,normal), 0.0);
+	float specular = 0.0;
 
-	vec4 diffuse = gl_FrontLightProductp[0].diffuse * max(dot(pass_Normal,L), 0.0);
-	diffuse = clamp(diffuse, 0.0, 1.0);
+	if (lambertian > 0.0)
+	{
+		vec3 viewDirection = normalize(-vertPos);
 
-	vec4 specular = gl_FrontLightProduct[0].specular * pow(max(dot(R,E),0.0), 0.3 * gl_FrontMaterial.shininess);
-	specular = clamp(spec, 0.0, 1.0);
+		vec3 halfDir = normalize(lightDir + viewDirection);
+		float specAngle = max(dot(halfDir, normal), 0.0);
+		specular = pow(specAngle, shininess);	
+	}
 
-	out_Color = gl_FrontLightModelProduct.sceneColor + ambient + diffuse + specular;
+	vec3 colorLiner = ambientColor + lambertian * diffuseColor + specular * specColor;
 
+
+
+    out_Color = vec4(colorLiner, 1.0);
 }

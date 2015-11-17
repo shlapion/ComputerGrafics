@@ -10,14 +10,15 @@ uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
 
-out vec4 v;
-
 out vec4 pass_Normal;
+out vec3 vertPos;
+out vec3 normalInt;
 
 void main(void)
-{	
-	v = vec4(ViewMatrix * vec4(in_Position, 1.0f));
-	
+{
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f);
-	pass_Normal = normalize(NormalMatrix * vec4(in_Normal, 0.0f));
+	pass_Normal = NormalMatrix * vec4(in_Normal, 0.0f);
+
+	vertPos = vec3(pass_Normal) / pass_Normal.w;
+	normalInt = vec3(NormalMatrix * vec4(in_Normal, 0.0));
 }
