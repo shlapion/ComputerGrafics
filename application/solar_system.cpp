@@ -586,6 +586,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
   }
+  else if(key==GLFW_KEY_9) {
+    glClearColor(1.0f,1.0f,1.0f,1.0f);
+  }
+  else if(key==GLFW_KEY_8) {
+    glClearColor(0.0f,0.0f,0.0f,1.0f);
+    // at the moment i don't know exactly how to change color of stars
+  }
 }
 
 void cursor_callback(GLFWwindow * window, double x, double y) {
