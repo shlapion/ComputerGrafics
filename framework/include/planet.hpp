@@ -10,91 +10,58 @@
 #define planet_h
 #include <iostream>
 
-class Planet {
-public:
+struct Planet {
     Planet(std::string name, float distance, float speed, float size) :
-            name_{name},
-            distance_{(distance>0.0f)?distance:-1.0f},
-            speed_{(speed>0.0f)?speed:-1.0f},
-            size_{(size>0.0f)?size:-1.0f},
-            type_{"sun"}
+            name{name},
+            distance{(distance>0.0f)?distance:-1.0f},
+            speed{(speed>0.0f)?speed:-1.0f},
+            size{(size>0.0f)?size:-1.0f},
+            type{"root"}
     { };
     Planet(std::string name, float distance, float speed, float size, std::string const& type) :
     /* types are: sun as root Object, planet and moon (moons are around a planet)
      * a moon need a pointer (name) to the planet.
      */
-            name_{name},
-            distance_{(distance>0.0f)?distance:-1.0f},
-            speed_{(speed>0.0f)?speed:-1.0f},
-            size_{(size>0.0f)?size:-1.0f},
-            type_{(type=="sun"||type=="moon"||type=="planet")?type:"error_type"}
+            name{name},
+            distance{(distance>0.0f)?distance:-1.0f},
+            speed{(speed>0.0f)?speed:-1.0f},
+            size{(size>0.0f)?size:-1.0f},
+            type{(type=="root"||type=="sun"||type=="moon"||type=="planet")? type : "error_type"}
     { };
 
-
-    std::string name() const {
-        return name_;
-    }
-
-    float distance() const {
-        return distance_;
-    }
-
-    void distance(float value) {
-        distance_=value;
-    }
-
-    float speed() const {
-        return speed_;
-    }
-
-    float size() const {
-        return size_;
-    }
-
-    std::string type() const {
-        return type_;
-    }
-
     bool is_moon() const {
-        return type_ == "moon";
+        return type == "moon";
     }
 
     bool is_root() const {
-        return type_=="root";
+        return (type == "root" || type == "sun");
     }
 
     bool is_planet() const {
-        return type_=="planet";
+        return type == "planet";
     }
 
-//    Planet* child() const { //whhaaa
-//        return child_;
-//    }
 
-//    Planet* parent() const { //whhaaa
-//        return parent_;
-//    }
-
-private:
-    std::string name_;
-    float distance_; // to the sun? [0,0,0] --> z
+    std::string name;
+    float distance; // to the sun? [0,0,0] --> z
     // Winkel, Höhenwinkel, Azimut? https://de.wikipedia.org/wiki/Azimut
-    float speed_;
-    float size_;
-    float mass_;
-    std::string type_;
-//    Planet* child_; // there could be more than one moon... hmm. maybe better perant?!!
+    float speed;
+    float size;
+    float mass;
+    std::string type; // type actually don't have a real meaning... i think we could also add an planet or the sun as a moon to a planet... and so on... so it doesn't matter.
+    std::vector<Planet*> moon;
+//    Planet* child_; // there could be more than one moon... hmm. maybe better parent?!!
 //    Planet* parent_;
     //position --> time, rotation
     //transformationMatrix
-    //inverTransposedMatrix
+    //invertTransposedMatrix
     //Texture
     //etc
 };
 
 /*
  Shape => Planet as list or tree or
-    -> Composit
+    -> Composite
     -> Planet
     -> Moon?
     -> Star(Sun)?

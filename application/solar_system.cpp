@@ -85,7 +85,7 @@ GLint location_model_matrix = -1;
 GLint location_view_matrix = -1;
 GLint location_projection_matrix = -1;
 
-// starClaud location
+// starCloud location
 GLint starCloud_view_matrix = -1;
 GLint starCloud_projection_matrix = -1;
 
@@ -223,20 +223,23 @@ struct Shader_Programm {
 
 
 void generate_solarSystem() {
-  Planet* moon;
-    //                         name,  distance,  speed, size, * parent, * child
+
+    //                         name,  distance,  speed, size, type [sun,planet,moon]
   Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
-  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,sun};
-  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,sun};
-  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,sun, moon};
-  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,sun};
-  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,sun};
-  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,sun};
-  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,sun};
-  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,sun};
+  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,"planet"};
+  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,"planet"};
+  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,"planet"};
+  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,"planet"};
+  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,"planet"};
+  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,"planet"};
+  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,"planet"};
+  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,"planet"};
 
-  moon = new Planet{"moon",0.1f*AU,3.0f,0.273f,earth};
 
+  Planet* moon = new Planet{"moon",0.01f*AU,3.0f,1.273f,"moon"};
+  earth->moon.push_back(moon);
+
+  // add planets to solar System
   solarSystem.push_back(sun);
   solarSystem.push_back(mercury);
   solarSystem.push_back(venus);
@@ -247,27 +250,25 @@ void generate_solarSystem() {
   solarSystem.push_back(uranus);
   solarSystem.push_back(neptun);
 
-  solarSystem.push_back(moon);
 
   float accumulatedSize = 0.0f;
   for (auto p:solarSystem) {
     if (p->is_root()) {
       // it is sun
-      accumulatedSize = p->size();
-    }else if (!p->is_moon()) {
-      p->distance(accumulatedSize);
-      accumulatedSize += p->size();
-      std::cout << p->name() << ": " << p->distance() << " next will be " << accumulatedSize << std::endl;
+      accumulatedSize = p->size/2; // half size of the sun
+    }else if (p->is_planet()) {
+      p->distance+=accumulatedSize; // every planets distance is given by the surface distance
+      //accumulatedSize += p->size;   // add the full size of the planet
+      // we dont need the size of each planet. the distance is given by sun surface to planet surface.
+      std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
     }
   }
-
-
   planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
   planet_object = initialize_geometry(planet_model);
 }
 
 void  generate_starCloud() {
-  // dont need an returning value like this.
+  // don't need an returning value like this.
   std::vector<float> stars;
 
   for (int i=0;i<number_of_stars;i++) {
@@ -352,7 +353,7 @@ void render() {
 
 
   glUseProgram(simple_program);
-  std::reverse(solarSystem.begin(), solarSystem.end());
+
   for (auto const &p : solarSystem) {
     float time = float(glfwGetTime());
     Planet* current = p;
@@ -367,24 +368,17 @@ void render() {
 
   glUseProgram(orbit_program);
   for (auto const&p:solarSystem) {
-//    Planet* current = p;
-    if (p->is_moon()) {
-      float deltaDistance = p->distance(); // delta+distance instead of inside the renderer provide flickering...
-//    while (current!= nullptr) {
-//      //deltaDistance += current->size();
-//      current=current->child();
-//    }
+      float deltaDistance = 0.0f;
       render_orbit(p, deltaDistance);
-    }
   }
 
 }
 
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
   glUseProgram(simple_program);
-  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size()});
-  model_matrix = glm::rotate(model_matrix,time * planet->speed(), glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
-  model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance() }); // radius of the rotation axis defined in AU
+  model_matrix = glm::scale(model_matrix, glm::vec3{planet->size});
+  model_matrix = glm::rotate(model_matrix,time * planet->speed, glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance }); // radius of the rotation axis defined in AU
 
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
@@ -395,6 +389,13 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   utils::validate_program(simple_program);
   // draw bound vertex array as triangles using bound shader
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), (gl::GLenum) model::INDEX.type, NULL);
+
+  if (!planet->moon.empty()) {
+    for (auto const &moon : planet->moon) {
+      render_Planet(moon, model_matrix, time);
+    }
+  }
+
 }
 
 void render_orbit(Planet* const& planet, float delta) {
