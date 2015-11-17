@@ -56,7 +56,7 @@ double last_second_time = 0;
 unsigned frames_per_second = 0;
 
 // the main shader program
-GLuint simple_program = 0;
+GLuint planet_program = 0;
 GLuint starCloud_program = 0;
 GLuint orbit_program = 0;
 
@@ -235,9 +235,10 @@ void generate_solarSystem() {
   Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,"planet"};
   Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,"planet"};
 
-
+  // generate moon and add them
   Planet* moon = new Planet{"moon",0.01f*AU,3.0f,1.273f,"moon"};
   earth->moon.push_back(moon);
+  mars->moon.push_back(moon);
 
   // add planets to solar System
   solarSystem.push_back(sun);
@@ -249,7 +250,6 @@ void generate_solarSystem() {
   solarSystem.push_back(saturn);
   solarSystem.push_back(uranus);
   solarSystem.push_back(neptun);
-
 
   float accumulatedSize = 0.0f;
   for (auto p:solarSystem) {
@@ -352,7 +352,7 @@ void render() {
   glDrawArrays(GL_POINTS, 0, number_of_stars);
 
 
-  glUseProgram(simple_program);
+  glUseProgram(planet_program);
 
   for (auto const &p : solarSystem) {
     float time = float(glfwGetTime());
@@ -375,7 +375,7 @@ void render() {
 }
 
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
-  glUseProgram(simple_program);
+  glUseProgram(planet_program);
   model_matrix = glm::scale(model_matrix, glm::vec3{planet->size});
   model_matrix = glm::rotate(model_matrix,time * planet->speed, glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance }); // radius of the rotation axis defined in AU
@@ -386,7 +386,7 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 
   glBindVertexArray(planet_object.vertex_AO);
-  utils::validate_program(simple_program);
+  utils::validate_program(planet_program);
   // draw bound vertex array as triangles using bound shader
   glDrawElements(GL_TRIANGLES, GLsizei(planet_model.indices.size()), (gl::GLenum) model::INDEX.type, NULL);
 
@@ -427,7 +427,7 @@ void update_view(GLFWwindow* window, int width, int height) {
      fixes the "bug" you can see in the W-key.mov */
   camera_projection = glm::perspective(fov_y, aspect, 0.1f, 1000.0f);
   // upload matrix to gpu
-  glUseProgram(simple_program);
+  glUseProgram(planet_program);
   glUniformMatrix4fv(location_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
 
   glUseProgram(starCloud_program);
@@ -448,7 +448,7 @@ void update_camera() {
   */
   glm::mat4 inv_camera_view = glm::inverse(camera_view);
   // upload matrix to gpu
-  glUseProgram(simple_program);
+  glUseProgram(planet_program);
   glUniformMatrix4fv(location_view_matrix, 1, GL_FALSE, glm::value_ptr(inv_camera_view));
 
   glUseProgram(starCloud_program);
@@ -464,14 +464,14 @@ void update_shader_programs() {
     GLuint simple_program = 0;
     GLuint starCloud_program = 0;
     */
-    std::vector<Shader_Programm> shaders;
-  shaders.push_back({"shaders/simple.vert", "shaders/simple.frag", &simple_program});
+  std::vector<Shader_Programm> shaders;
+  shaders.push_back({"shaders/simple.vert", "shaders/simple.frag", &planet_program});
   shaders.push_back({"shaders/starCloud.vert","shaders/starCloud.frag", &starCloud_program});
   shaders.push_back({"shaders/orbit.vert","shaders/orbit.frag", &orbit_program});
 
   try {
     for (auto item : shaders) {
-      // throws exception when compiling was unsuccessfull
+      // throws exception when compiling was unsuccessful
       GLuint new_program = shader_loader::program(resource_path + item.vertex_path,
                                                   resource_path + item.frag_path);
       // free old shader
@@ -497,17 +497,17 @@ void update_shader_programs() {
 
 // update shader uniform locations
 void update_uniform_locations() {
-  location_normal_matrix = glGetUniformLocation(simple_program, "NormalMatrix");
-  location_model_matrix = glGetUniformLocation(simple_program, "ModelMatrix");
-  location_view_matrix = glGetUniformLocation(simple_program, "ViewMatrix");
-  location_projection_matrix = glGetUniformLocation(simple_program, "ProjectionMatrix");
+  location_normal_matrix = glGetUniformLocation(planet_program, "NormalMatrix");
+  location_model_matrix = glGetUniformLocation(planet_program, "ModelMatrix");
+  location_view_matrix = glGetUniformLocation(planet_program, "ViewMatrix");
+  location_projection_matrix = glGetUniformLocation(planet_program, "ProjectionMatrix");
 
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
   starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
 
-  orbit_model_matrix = glGetUniformLocation(simple_program, "ModelMatrix");
-  orbit_view_matrix = glGetUniformLocation(simple_program, "ViewMatrix");
-  orbit_projection_matrix = glGetUniformLocation(simple_program, "ProjectionMatrix");
+  orbit_model_matrix = glGetUniformLocation(orbit_program, "ModelMatrix");
+  orbit_view_matrix = glGetUniformLocation(orbit_program, "ViewMatrix");
+  orbit_projection_matrix = glGetUniformLocation(orbit_program, "ProjectionMatrix");
 }
 
 ///////////////////////////// misc functions ////////////////////////////////
@@ -561,7 +561,7 @@ void show_fps() {
 
 void quit(int status) {
   // free opengl resources
-  glDeleteProgram(simple_program);
+  glDeleteProgram(planet_program);
   glDeleteBuffers(1, &planet_object.vertex_BO);
   glDeleteVertexArrays(1, &planet_object.element_BO);
   glDeleteVertexArrays(1, &planet_object.vertex_AO);
