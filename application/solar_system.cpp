@@ -436,7 +436,7 @@ void update_view(GLFWwindow* window, int width, int height) {
                                                     T const & 	far ) 
      changed far point from 10.0f to 100.0f  - maybe it should a bit smaller... 
      fixes the "bug" you can see in the W-key.mov */
-  camera_projection = glm::perspective(fov_y, aspect, 0.1f, 1000.0f);
+  camera_projection = glm::perspective(fov_y, aspect, 0.1f*AU*2, 100*AU);
   // upload matrix to gpu
   glUseProgram(planet_program);
   glUniformMatrix4fv(location_projection_matrix, 1, GL_FALSE, glm::value_ptr(camera_projection));
