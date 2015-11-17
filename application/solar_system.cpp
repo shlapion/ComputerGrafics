@@ -589,7 +589,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 void cursor_callback(GLFWwindow * window, double x, double y) {
-  int sensitivity = 100;
+  int sensitivity = 10;
   camera_view = glm::translate(camera_view, glm::vec3{-x/sensitivity,y/sensitivity,0.0f});
   glfwSetCursorPos(window,0,0);
   update_camera();
