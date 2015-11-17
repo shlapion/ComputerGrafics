@@ -35,7 +35,8 @@ using namespace gl;
 //Defina Astronomical Unit(AU) unit of length roughly equal to the distance from the earth to the sun 
 const float AU = 30.0f;
 const int number_of_stars = 10000;
-const int number_of_orbitFragment = 36000;
+//const int number_of_orbitFragment = 3.6*50000;
+const int number_of_orbitFragment = 50000;
 #ifndef M_PI
   #define M_PI 3.14f
 #endif
