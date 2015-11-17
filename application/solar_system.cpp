@@ -123,12 +123,12 @@ void render_orbit(Planet* const& planet, float delta);
 
 
 std::string print(glm::mat4 mat) {
-  std::string os ="\n{ ";
+  std::string os ="\n{ \n";
   for (int i=0; i<=3; i++) {
     for (int j=0; j<=3; j++) {
-      if (i==0 & j==0) os+="\n[ ";
-      os+=std::to_string(mat[i][j]);
-      if (i==3) os+=" ]"; else os+=" ;";
+      if ( j==0) os+="[ ";
+      os+=std::to_string(mat[j][i]);
+      if (j==3) os+=" ]\n"; else os+=" ;";
     }
   }
   return os+" }";
