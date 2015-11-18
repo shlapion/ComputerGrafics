@@ -37,6 +37,9 @@ const float AU = 30.0f;
 const float AU_scale = 1.6;
 const int number_of_stars = 10000;
 float speed_time = 1.0f;
+
+float Shading_Option = 1; // at the moment 1 for Blinn-Phong and 2 for Toon
+
 //const int number_of_orbitFragment = 3.6*50000;
 const int number_of_orbitFragment = 50000;
 #ifndef M_PI
@@ -88,6 +91,7 @@ GLint location_model_matrix = -1;
 GLint location_view_matrix = -1;
 GLint location_projection_matrix = -1;
 GLint location_planet_color = -1;
+GLint location_Shading_Option = -1;
 
 // starCloud location
 GLint starCloud_view_matrix = -1;
@@ -404,7 +408,9 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 
   // upload color
+
   glUniform3f(location_planet_color, planet->color.r, planet->color.g, planet->color.b);
+  glUniform1f(location_Shading_Option,Shading_Option);
 
   glBindVertexArray(planet_object.vertex_AO);
   utils::validate_program(planet_program);
@@ -523,6 +529,7 @@ void update_uniform_locations() {
   location_view_matrix = glGetUniformLocation(planet_program, "ViewMatrix");
   location_projection_matrix = glGetUniformLocation(planet_program, "ProjectionMatrix");
   location_planet_color = glGetUniformLocation(planet_program, "ColorVec");
+  location_Shading_Option = glGetUniformLocation(planet_program,"ShadingOption");
 
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
   starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
