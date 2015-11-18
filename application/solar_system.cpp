@@ -85,6 +85,7 @@ GLint location_normal_matrix = -1;
 GLint location_model_matrix = -1;
 GLint location_view_matrix = -1;
 GLint location_projection_matrix = -1;
+GLint location_planet_color = -1;
 
 // starCloud location
 GLint starCloud_view_matrix = -1;
@@ -399,6 +400,9 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view * model_matrix));
   glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 
+  // upload color
+  glUniform3f(location_planet_color, planet->color.r, planet->color.g, planet->color.b);
+
   glBindVertexArray(planet_object.vertex_AO);
   utils::validate_program(planet_program);
   // draw bound vertex array as triangles using bound shader
@@ -515,6 +519,7 @@ void update_uniform_locations() {
   location_model_matrix = glGetUniformLocation(planet_program, "ModelMatrix");
   location_view_matrix = glGetUniformLocation(planet_program, "ViewMatrix");
   location_projection_matrix = glGetUniformLocation(planet_program, "ProjectionMatrix");
+  location_planet_color = glGetUniformLocation(planet_program, "ColorVec");
 
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
   starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");

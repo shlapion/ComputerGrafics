@@ -16,6 +16,7 @@ uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
+uniform vec3 ColorVec;
 /*
     The uniform modifier specifies that a variable’s value will be
     specified by the application before the shader’s execution
@@ -42,6 +43,7 @@ glGetUniformLocation() routine.
 out vec4 pass_Normal;
 out vec3 vertPos;
 out vec3 normalInt;
+out vec3 pass_Color;
 /*
     The out modifier is used to qualify outputs from a shader
     stage - for example, the transformed homogeneous coordinates
@@ -57,4 +59,5 @@ void main(void)
 
 	vertPos = vec3(pass_Normal) / pass_Normal.w;
 	normalInt = vec3(NormalMatrix * vec4(in_Normal, 0.0));
+	pass_Color = ColorVec;
 }
