@@ -276,7 +276,7 @@ void generate_solarSystem() {
       p->distance+=accumulatedSize + p->size; // every planets distance is given by the surface distance
       //accumulatedSize += p->size;   // add the full size of the planet
       // we dont need the size of each planet. the distance is given by sun surface to planet surface.
-      std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
+      //std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
     }
   }
   planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
@@ -574,20 +574,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     update_camera();
   }
   else if(key == GLFW_KEY_Q && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
     camera_view = glm::rotate(camera_view, 0.1f, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
     update_camera();
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
   }
   else if(key == GLFW_KEY_E && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
     update_camera();
   }
   else if((key == GLFW_KEY_Y | key==GLFW_KEY_Z) && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
     camera_view = glm::rotate(camera_view, 0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
   }
   else if(key == GLFW_KEY_X && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
