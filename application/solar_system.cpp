@@ -34,6 +34,7 @@ using namespace gl;
 
 //Defina Astronomical Unit(AU) unit of length roughly equal to the distance from the earth to the sun 
 const float AU = 30.0f;
+const float AU_scale = 1.6;
 const int number_of_stars = 10000;
 //const int number_of_orbitFragment = 3.6*50000;
 const int number_of_orbitFragment = 50000;
@@ -85,6 +86,7 @@ GLint location_normal_matrix = -1;
 GLint location_model_matrix = -1;
 GLint location_view_matrix = -1;
 GLint location_projection_matrix = -1;
+GLint location_planet_color = -1;
 
 // starCloud location
 GLint starCloud_view_matrix = -1;
@@ -110,6 +112,7 @@ void update_uniform_locations();
 void update_shader_programs();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void cursor_callback(GLFWwindow * window, double x, double y);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void generate_solarSystem();
 void  generate_starCloud();
 void generate_orbits();
@@ -168,6 +171,7 @@ int main(int argc, char* argv[]) {
   glfwSetKeyCallback(window, key_callback);
   //register curser position input function
   glfwSetCursorPosCallback(window,cursor_callback);
+  glfwSetScrollCallback(window, scroll_callback);
   // allow free mouse movement
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   // register resizing function
@@ -237,18 +241,18 @@ struct Shader_Programm {
 void generate_solarSystem() {
 
     //                         name,  distance,  speed, size, type [sun,planet,moon]
-  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
-  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,"planet"};
-  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,"planet"};
-  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,"planet"};
-  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,"planet"};
-  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,"planet"};
-  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,"planet"};
-  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,"planet"};
-  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,"planet"};
-
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,AU_scale *  9.90f};
+  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.5f,AU_scale *  0.3829f,"planet",{0.91f,0.78f,0.65f}};
+  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f,AU_scale *  0.9499f,"planet",{0.88f,0.56f,0.18f}};
+  Planet* earth =   new Planet{"earth",         AU,1.2f,AU_scale *  1.0f,"planet",{0.40f,0.78f,1.00f}};
+  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f,AU_scale *  0.533f,"planet",{0.55f,0.46f,0.00f}};
+  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f,AU_scale *  6.0f,"planet",{0.55f,0.53f,0.31f}};
+  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f,AU_scale *  5.0f,"planet",{0.67f,0.40f,0.00f}};
+  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f,AU_scale *  3.929f,"planet",{0.90f,0.91f,0.80f}};
+  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f,AU_scale *  3.883f,"planet",{0.43f,0.61f,0.95f}};
+  // http://www.december.com/html/spec/colorper.html
   // generate moon and add them
-  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,1.273f,"moon"};
+  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,0.273f,"moon",{0.92f,0.92f,0.92f}};
   earth->moon.push_back(moon);
   mars->moon.push_back(moon);
 
@@ -272,7 +276,7 @@ void generate_solarSystem() {
       p->distance+=accumulatedSize + p->size; // every planets distance is given by the surface distance
       //accumulatedSize += p->size;   // add the full size of the planet
       // we dont need the size of each planet. the distance is given by sun surface to planet surface.
-      std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
+      //std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
     }
   }
   planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
@@ -399,6 +403,9 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view * model_matrix));
   glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 
+  // upload color
+  glUniform3f(location_planet_color, planet->color.r, planet->color.g, planet->color.b);
+
   glBindVertexArray(planet_object.vertex_AO);
   utils::validate_program(planet_program);
   // draw bound vertex array as triangles using bound shader
@@ -515,6 +522,7 @@ void update_uniform_locations() {
   location_model_matrix = glGetUniformLocation(planet_program, "ModelMatrix");
   location_view_matrix = glGetUniformLocation(planet_program, "ViewMatrix");
   location_projection_matrix = glGetUniformLocation(planet_program, "ProjectionMatrix");
+  location_planet_color = glGetUniformLocation(planet_program, "ColorVec");
 
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
   starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
@@ -566,31 +574,47 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     update_camera();
   }
   else if(key == GLFW_KEY_Q && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
     camera_view = glm::rotate(camera_view, 0.1f, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
     update_camera();
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
   }
   else if(key == GLFW_KEY_E && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{-0.1f*AU, 0.0f, 0.0f});
     update_camera();
   }
   else if((key == GLFW_KEY_Y | key==GLFW_KEY_Z) && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
     camera_view = glm::rotate(camera_view, 0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
-    std::cout << print(camera_view);
+    //std::cout << print(camera_view);
   }
   else if(key == GLFW_KEY_X && (action == GLFW_PRESS | action == GLFW_REPEAT)) {
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
   }
-  else if(key==GLFW_KEY_9) {
+  else if(key==GLFW_KEY_9 && action == GLFW_PRESS) {
     glClearColor(1.0f,1.0f,1.0f,1.0f);
   }
-  else if(key==GLFW_KEY_8) {
+  else if(key==GLFW_KEY_8 && action == GLFW_PRESS) {
     glClearColor(0.0f,0.0f,0.0f,1.0f);
     // at the moment i don't know exactly how to change color of stars
+  }
+  else if (key==GLFW_KEY_P && action == GLFW_PRESS) {
+    std::cout << "Print Camera_View Matrix "<< print(camera_view) << std::endl;
+  }
+  else if (key==GLFW_KEY_B && action == GLFW_PRESS) {
+    camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 30.0f, 150.0f});
+    update_camera();
+  }
+  else if (key==GLFW_KEY_T && action == GLFW_PRESS) {
+    glm::vec3 pos = glm::vec3(0.0f, solarSystem.back()->distance*2 , 0.0f);
+    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
+
+    camera_view = glm::lookAt(pos, target, up);
+    camera_view = glm::inverse(camera_view);
+    update_camera();
   }
 }
 
@@ -598,6 +622,15 @@ void cursor_callback(GLFWwindow * window, double x, double y) {
   int sensitivity = 10;
   camera_view = glm::translate(camera_view, glm::vec3{-x/sensitivity,y/sensitivity,0.0f});
   glfwSetCursorPos(window,0,0);
+  update_camera();
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+  //int sensitivity = 10;
+  camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU*yoffset});
+  //camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{0.0f, 0.0f, 0.1f*xoffset});
+  // rotation, sometimes black screen
   update_camera();
 }
 
