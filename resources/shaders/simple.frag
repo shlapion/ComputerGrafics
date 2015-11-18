@@ -19,7 +19,7 @@ void main(void)
     vec3 diffuseColor = pass_Color; //vec3(0.5, 0.0, 0.0);
 
 	vec3 normal = normalize(normalInt);
-	vec3 lightDir = normalize(lightPos);
+	vec3 lightDir = normalize(lightPos -vertPos);
 
 	float lambertian = max(dot(lightDir,normal), 0.0);
 	float specular = 0.0;
