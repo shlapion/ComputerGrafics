@@ -38,7 +38,7 @@ void main(void)
     else lambertian = D;
 
 	float specular = max(dot(H,normal), 0.0); //sf
-	specular = pow(sf, shininess);
+	specular = pow(specular, shininess);
 	specular = step(0.5, specular);
 
 
