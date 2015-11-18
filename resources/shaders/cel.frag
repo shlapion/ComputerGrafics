@@ -39,7 +39,7 @@ void main(void)
 
 	float specular = max(dot(H,normal), 0.0); //sf
 	specular = pow(sf, shininess);
-	sf = step(0.5, sf);
+	specular = step(0.5, specular);
 
 
 	vec3 color = ambientColor + lambertian * diffuseColor + specular * specColor;
