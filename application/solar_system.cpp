@@ -123,11 +123,10 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time);
 //void render_starfield();
 void render_orbit(Planet* const& planet, float delta);
 
-
 std::string print(glm::mat4 mat) {
-  std::string os ="\n{ \n";
-  for (int i=0; i<=3; i++) {
-    for (int j=0; j<=3; j++) {
+  std::string os ="\n{ \n";    // more generic version? - a mat type for every
+  for (int i=0; i<=3; i++) {   // mat.lenght() --> number of columns
+    for (int j=0; j<=3; j++) { // mat[0].lenght() --> number of components in column
       if ( j==0) os+="[ ";
       os+=std::to_string(mat[j][i]);
       if (j==3) os+=" ]\n"; else os+=" ;";
