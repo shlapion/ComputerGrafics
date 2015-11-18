@@ -1,6 +1,33 @@
 114274 - **Endre Papp**
 113260 - **Martin Heinrich**
 
+## Key Binding
+- `1` - Blinn-Phong Shading
+- `2` - Cel-Shading
+
+- `Up` - move up
+- `Down` - move down
+- `Left` - move left
+- `Right` - move right
+
+- `W` and `scroll up` - move forward
+- `S` and `scroll down`- move backward
+- `A` - rotate to right
+- `D` - rotate to left
+- `Y` and `Z` - rotate clockwise
+- `X` - rotate counterclockwise
+- `Q` - rotate down
+- `E` - rotate up
+
+- `B` - reset view position
+- `T` - view from top
+
+- `Space` - Reset Speed and or Pause the movement
+- `L` and `K` - change movement speed and direction
+
+- `P` - Printout some information at the moment the camera_view Matrix
+
+
 ## OpenGLFramework
 is a small cross-platform framework
 
