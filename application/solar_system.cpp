@@ -368,16 +368,15 @@ void render() {
 
 
   glUseProgram(planet_program);
-//  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
-//  glm::mat4 translation_sun{};
-//  render_Planet(sun,translation_sun,0);
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,9.90f};
+  glm::mat4 translation_sun{};
+  render_Planet(sun,translation_sun,0);
   for (auto const &p : solarSystem) {
     float time = float(glfwGetTime());
     Planet* current = p;
     glm::mat4 translation;
     glm::vec3 position;
-
-    render_Planet(p, translation, time);
+    if (p->name!="sun") render_Planet(p, translation, time);
   }
 
 
