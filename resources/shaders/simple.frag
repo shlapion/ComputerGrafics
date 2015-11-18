@@ -18,7 +18,7 @@ void main(void)
 	vec3 ambientColor = pass_Color; //vec3(0.1, 0.0, 0.0);
     vec3 diffuseColor = pass_Color; //vec3(0.5, 0.0, 0.0);
 
-	vec3 normal = normalize(normalInt);
+	vec3 normal = normalize(normalInt  - vertPos);
 	vec3 lightDir = normalize(lightPos - vertPos);
 
 	float lambertian = max(dot(lightDir,normal), 0.0);
@@ -33,7 +33,7 @@ void main(void)
 		specular = pow(specAngle, shininess);	
 	}
 
-	vec3 colorLinear = ambientColor + lambertian * diffuseColor + specular * specColor;
+	vec3 colorLinear = ambientColor* vec3(0.3f) + lambertian * diffuseColor + specular * specColor;
 
 	vec3 colorGammaCorrected = pow(colorLinear, vec3(1.0/screenGamma));
 

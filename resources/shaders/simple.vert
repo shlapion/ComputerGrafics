@@ -55,9 +55,10 @@ out vec3 pass_Color;
 void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f);
-	pass_Normal = NormalMatrix * vec4(in_Normal, 0.0f);
 
-	vertPos = vec3(pass_Normal) / pass_Normal.w;
-	normalInt = vec3(NormalMatrix * vec4(in_Normal, 0.0));
-	pass_Color = ColorVec;
+    vec4 vertPos4 = ModelMatrix * vec4(in_Position, 1.0);
+    vertPos = vec3(vertPos4) / vertPos4.w;
+
+    normalInt = vec3(NormalMatrix * vec4(in_Normal, 0.0));
+    pass_Color = ColorVec;
 }
