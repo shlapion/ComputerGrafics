@@ -623,10 +623,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera_view = glm::inverse(camera_view);
     update_camera();
   }
-  else if (key==GLFW_KEY_F13 && action == GLFW_PRESS) {
+  else if (key==GLFW_KEY_L && action == GLFW_PRESS) {
     speed_time += 0.1f;
   }
-  else if (key==GLFW_KEY_F14 && action == GLFW_PRESS) {
+  else if (key==GLFW_KEY_K && action == GLFW_PRESS) {
     speed_time -= 0.1f;
   }
   else if (key==GLFW_KEY_SPACE && action == GLFW_PRESS) {
