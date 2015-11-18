@@ -33,7 +33,7 @@ void main(void)
 		specular = pow(specAngle, shininess);	
 	}
 
-	vec3 colorLinear = ambientColor* vec3(0.3f) + lambertian * diffuseColor + specular * specColor;
+	vec3 colorLinear = ambientColor* vec3(0.1f) + lambertian * diffuseColor + specular * specColor;
 
 	vec3 colorGammaCorrected = pow(colorLinear, vec3(1.0/screenGamma));
 

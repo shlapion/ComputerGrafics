@@ -36,6 +36,7 @@ using namespace gl;
 const float AU = 30.0f;
 const float AU_scale = 1.6;
 const int number_of_stars = 10000;
+float speed_time = 1.0f;
 //const int number_of_orbitFragment = 3.6*50000;
 const int number_of_orbitFragment = 50000;
 #ifndef M_PI
@@ -393,7 +394,7 @@ void render() {
 
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
   glUseProgram(planet_program);
-  model_matrix = glm::rotate(model_matrix,time * planet->speed, glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
+  model_matrix = glm::rotate(model_matrix,time * planet->speed * speed_time, glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
   model_matrix = glm::translate(model_matrix, glm::vec3{ 0.0f, 0.0f, planet->distance }); // radius of the rotation axis defined in AU
   model_matrix = glm::scale(model_matrix, glm::vec3{planet->size});
   //if (planet->name == "sun") std::cout <<  planet->name << " " << print(model_matrix) << std::endl;
@@ -614,6 +615,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera_view = glm::lookAt(pos, target, up);
     camera_view = glm::inverse(camera_view);
     update_camera();
+  }
+  else if (key==GLFW_KEY_F13 && action == GLFW_PRESS) {
+    speed_time += 0.1f;
+  }
+  else if (key==GLFW_KEY_F14 && action == GLFW_PRESS) {
+    speed_time -= 0.1f;
+  }
+  else if (key==GLFW_KEY_SPACE && action == GLFW_PRESS) {
+    if (speed_time == 0.0f) {
+      speed_time = 1.0f;
+    } else {
+      speed_time = 0.0f;
+    }
   }
 }
 
