@@ -593,12 +593,28 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
   }
-  else if(key==GLFW_KEY_9) {
+  else if(key==GLFW_KEY_9 && action == GLFW_PRESS) {
     glClearColor(1.0f,1.0f,1.0f,1.0f);
   }
-  else if(key==GLFW_KEY_8) {
+  else if(key==GLFW_KEY_8 && action == GLFW_PRESS) {
     glClearColor(0.0f,0.0f,0.0f,1.0f);
     // at the moment i don't know exactly how to change color of stars
+  }
+  else if (key==GLFW_KEY_P && action == GLFW_PRESS) {
+    std::cout << "Print Camera_View Matrix "<< print(camera_view) << std::endl;
+  }
+  else if (key==GLFW_KEY_B && action == GLFW_PRESS) {
+    camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 30.0f, 150.0f});
+    update_camera();
+  }
+  else if (key==GLFW_KEY_T && action == GLFW_PRESS) {
+    glm::vec3 pos = glm::vec3(0.0f, solarSystem.back()->distance*2 , 0.0f);
+    glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
+
+    camera_view = glm::lookAt(pos, target, up);
+    camera_view = glm::inverse(camera_view);
+    update_camera();
   }
 }
 
