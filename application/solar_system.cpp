@@ -238,17 +238,17 @@ void generate_solarSystem() {
 
     //                         name,  distance,  speed, size, type [sun,planet,moon]
   Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
-  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,"planet"};
-  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,"planet"};
-  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,"planet"};
-  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,"planet"};
-  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,"planet"};
-  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,"planet"};
-  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,"planet"};
-  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,"planet"};
+  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,"planet",{0.86f,0.64f,0.80f}};
+  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,"planet",{0.88f,0.85f,0.45f}};
+  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,"planet",{0.93f,0.79f,0.0f}};
+  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,"planet",{0.68f,0.73f,0.32f}};
+  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,"planet",{0.69f,0.25f,0.21f}};
+  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,"planet",{0.70f,0.53f,0.28f}};
+  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,"planet",{0.65f,0.16f,0.16f}};
+  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,"planet",{0.60f,0.20f,0.80f}};
 
   // generate moon and add them
-  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,1.273f,"moon"};
+  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,1.273f,"moon",{0.92f,0.92f,0.92f}};
   earth->moon.push_back(moon);
   mars->moon.push_back(moon);
 
