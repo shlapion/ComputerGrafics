@@ -16,9 +16,10 @@ struct Planet {
             distance{(distance>0.0f)?distance:-1.0f},
             speed{(speed>0.0f)?speed:-1.0f},
             size{(size>0.0f)?size:-1.0f},
-            type{"root"}
+            type{"root"},
+            color{0.8f,0.52f,0.0f}
     { };
-    Planet(std::string name, float distance, float speed, float size, std::string const& type) :
+    Planet(std::string name, float distance, float speed, float size, std::string const& type, glm::vec3 color) :
     /* types are: sun as root Object, planet and moon (moons are around a planet)
      * a moon need a pointer (name) to the planet.
      */
@@ -26,7 +27,8 @@ struct Planet {
             distance{(distance>0.0f)?distance:-1.0f},
             speed{(speed>0.0f)?speed:-1.0f},
             size{(size>0.0f)?size:-1.0f},
-            type{(type=="root"||type=="sun"||type=="moon"||type=="planet")? type : "error_type"}
+            type{(type=="root"||type=="sun"||type=="moon"||type=="planet")? type : "error_type"},
+            color{color}
     { };
 
     bool is_moon() const {
@@ -50,6 +52,7 @@ struct Planet {
     float mass;
     std::string type; // type actually don't have a real meaning... i think we could also add an planet or the sun as a moon to a planet... and so on... so it doesn't matter.
     std::vector<Planet*> moon;
+    glm::vec3 color;
 //    Planet* child_; // there could be more than one moon... hmm. maybe better parent?!!
 //    Planet* parent_;
     //position --> time, rotation
