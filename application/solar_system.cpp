@@ -34,6 +34,7 @@ using namespace gl;
 
 //Defina Astronomical Unit(AU) unit of length roughly equal to the distance from the earth to the sun 
 const float AU = 30.0f;
+const float AU_scale = 1.6;
 const int number_of_stars = 10000;
 //const int number_of_orbitFragment = 3.6*50000;
 const int number_of_orbitFragment = 50000;
@@ -111,6 +112,7 @@ void update_uniform_locations();
 void update_shader_programs();
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void cursor_callback(GLFWwindow * window, double x, double y);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void generate_solarSystem();
 void  generate_starCloud();
 void generate_orbits();
@@ -169,6 +171,7 @@ int main(int argc, char* argv[]) {
   glfwSetKeyCallback(window, key_callback);
   //register curser position input function
   glfwSetCursorPosCallback(window,cursor_callback);
+  glfwSetScrollCallback(window, scroll_callback);
   // allow free mouse movement
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   // register resizing function
@@ -238,18 +241,18 @@ struct Shader_Programm {
 void generate_solarSystem() {
 
     //                         name,  distance,  speed, size, type [sun,planet,moon]
-  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,2.90f};
-  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.0f, 0.3829f,"planet",{0.86f,0.64f,0.80f}};
-  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f, 0.9499f,"planet",{0.88f,0.85f,0.45f}};
-  Planet* earth =   new Planet{"earth",         AU,1.0f, 1.0f,"planet",{0.93f,0.79f,0.0f}};
-  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f, 0.533f,"planet",{0.68f,0.73f,0.32f}};
-  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f, 6.0f,"planet",{0.69f,0.25f,0.21f}};
-  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f, 5.0f,"planet",{0.70f,0.53f,0.28f}};
-  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f, 3.929f,"planet",{0.65f,0.16f,0.16f}};
-  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f, 3.883f,"planet",{0.60f,0.20f,0.80f}};
-
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,AU_scale *  9.90f};
+  Planet* mercury = new Planet{"mercury",  0.4f*AU,2.5f,AU_scale *  0.3829f,"planet",{0.91f,0.78f,0.65f}};
+  Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f,AU_scale *  0.9499f,"planet",{0.88f,0.56f,0.18f}};
+  Planet* earth =   new Planet{"earth",         AU,1.2f,AU_scale *  1.0f,"planet",{0.40f,0.78f,1.00f}};
+  Planet* mars =    new Planet{"mars",     1.5f*AU,1.0f,AU_scale *  0.533f,"planet",{0.55f,0.46f,0.00f}};
+  Planet* jupiter = new Planet{"jupiter",  3.2f*AU,0.8f,AU_scale *  6.0f,"planet",{0.55f,0.53f,0.31f}};
+  Planet* saturn =  new Planet{"saturn",   5.5f*AU,0.7f,AU_scale *  5.0f,"planet",{0.67f,0.40f,0.00f}};
+  Planet* uranus =  new Planet{"uranus",  19.2f*AU,0.5f,AU_scale *  3.929f,"planet",{0.90f,0.91f,0.80f}};
+  Planet* neptun =  new Planet{"neptun",  18.0f*AU,0.4f,AU_scale *  3.883f,"planet",{0.43f,0.61f,0.95f}};
+  // http://www.december.com/html/spec/colorper.html
   // generate moon and add them
-  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,1.273f,"moon",{0.92f,0.92f,0.92f}};
+  Planet* moon = new Planet{"moon",0.1f*AU,3.0f,0.273f,"moon",{0.92f,0.92f,0.92f}};
   earth->moon.push_back(moon);
   mars->moon.push_back(moon);
 
@@ -603,6 +606,15 @@ void cursor_callback(GLFWwindow * window, double x, double y) {
   int sensitivity = 10;
   camera_view = glm::translate(camera_view, glm::vec3{-x/sensitivity,y/sensitivity,0.0f});
   glfwSetCursorPos(window,0,0);
+  update_camera();
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+  //int sensitivity = 10;
+  camera_view = glm::translate(camera_view, glm::vec3{0.0f, 0.0f, 0.1f*AU*yoffset});
+  //camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{0.0f, 0.0f, 0.1f*xoffset});
+  // rotation, sometimes black screen
   update_camera();
 }
 
