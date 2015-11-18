@@ -636,6 +636,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
       speed_time = 0.0f;
     }
   }
+  else if (key==GLFW_KEY_1 && action == GLFW_PRESS) {
+    Shading_Option = 1; // Blinn Phong Shading in simple.frag
+  }
+  else if (key==GLFW_KEY_2 && action == GLFW_PRESS) {
+    Shading_Option = 2; // Toon Shading in simple.frag
+  }
 }
 
 void cursor_callback(GLFWwindow * window, double x, double y) {
