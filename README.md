@@ -27,7 +27,11 @@
 
 - `P` - Printout some information at the moment the camera_view Matrix
 
+![Animation](https://github.com/shlapion/ComputerGrafics/blob/develop/at_the_moment_it_seems_ok.gif)
 
+*use the higher resolution video to see the stars and evereything better* [.mov Video](https://github.com/shlapion/ComputerGrafics/blob/develop/at_the_moment_it_seems_ok.mov?raw=true)
+
+---------------------------------------
 ## OpenGLFramework
 is a small cross-platform framework
 
