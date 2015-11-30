@@ -284,7 +284,7 @@ void generate_solarSystem() {
       //std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
     }
   }
-  planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
+  planet_model = model_loader::obj(resource_path + "models/sphere.obj", model::NORMAL);
   planet_object = initialize_geometry(planet_model);
 }
 
