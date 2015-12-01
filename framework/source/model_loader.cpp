@@ -58,6 +58,19 @@ model obj(std::string const& name, model::attrib_flag_t import_attribs){
       }
     }
 
+    bool has_tangents = import_attribs & model::TANGENT;
+    std::vector<glm::vec3> tangents;
+    if (has_tangents) {
+      if (!has_uvs) {
+        has_tangents = false;
+        attributes ^= model::TANGENT;
+        std::cerr << "Shape has no texcoords" << std::endl;
+      }
+      else {
+        tangents = generate_tangents(curr_mesh);
+      }
+    }
+
     // push back vertex attributes
     for (unsigned i = 0; i < curr_mesh.positions.size() / 3; ++i) {
       vertex_data.push_back(curr_mesh.positions[i * 3]);
@@ -73,6 +86,11 @@ model obj(std::string const& name, model::attrib_flag_t import_attribs){
       if (has_uvs) {
         vertex_data.push_back(curr_mesh.texcoords[i * 2]);
         vertex_data.push_back(curr_mesh.texcoords[i * 2 + 1]);
+      }
+      if (has_tangents) {
+        vertex_data.push_back(tangents[i].x);
+        vertex_data.push_back(tangents[i].y);
+        vertex_data.push_back(tangents[i].z);
       }
     }
 
