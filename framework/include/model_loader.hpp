@@ -9,7 +9,7 @@ namespace model_loader {
 
 model obj(std::string const& path, model::attrib_flag_t import_attribs = model::POSITION);
 
-void generate_normals(tinyobj::mesh_t& model);
+//void generate_normals(tinyobj::mesh_t& model);
 
 }
 
