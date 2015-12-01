@@ -28,11 +28,6 @@ model obj(std::string const& name, model::attrib_flag_t import_attribs){
 
   model::attrib_flag_t attributes{model::POSITION | import_attribs};
 
-  if(import_attribs & model::TANGENT) {
-    // create tangents and bitangents?
-    throw std::invalid_argument("Attribute nr. " + std::to_string(model::TANGENT) + "not supported");
-  }
-
   std::vector<float> vertex_data;
   std::vector<unsigned> triangles;
 
