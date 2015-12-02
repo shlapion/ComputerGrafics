@@ -41,7 +41,8 @@ void main(void)
 
 	vec3 TextureColor = (texture(Texture, pass_TextureCoordinate)).rgb; // without alpha
 
-	vec3 colorLinear = ambientColor* vec3(0.1f) * TextureColor + lambertian * diffuseColor * TextureColor+ specular * specColor;
+	//vec3 colorLinear = ambientColor* vec3(0.1f) * TextureColor + lambertian * diffuseColor * TextureColor+ specular * specColor;
+	vec3 colorLinear = vec3(0.1f) * TextureColor + lambertian * TextureColor+ specular * specColor;
 
 	vec3 colorGammaCorrected = pow(colorLinear, vec3(1.0/screenGamma));
 
