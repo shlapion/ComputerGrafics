@@ -63,7 +63,7 @@ void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f);
 
-    vertPos = vec3(ViewMatrix  * vec4(in_Position,1.0));
+    vertPos = vec3((ViewMatrix * ModelMatrix)  * vec4(in_Position,1.0));
 
 
     // normalInt and pass_Normal is the same. And pass_Normal is better name convention
@@ -72,7 +72,11 @@ void main(void)
 
 	pass_Color = ColorVec;
 
-    lightPos = normalize(SunPosition - vertPos);
+    // deal with world and model coordinates
+    vec4 lightDirection = vec4(SunPosition, 1.0f) - (ModelMatrix * vec4(in_Position, 1.0f));
+    lightPos = vec3(normalize(vec3(ViewMatrix * lightDirection)));
+    //lightPos = normalize(SunPosition - vertPos);
+
 
 	pass_shading_optin = ShadingOption;
 
