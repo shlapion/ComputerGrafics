@@ -290,6 +290,28 @@ void generate_solarSystem() {
               name,
               utils::texture_object( texture_loader::file( filename ) ))
               );
+
+      /*
+      // I Dont know how it works correctly
+      glActiveTexture(GL_TEXTURE0);
+      glGenTextures(1,&textureMap.at(item->name));
+      glBindTexture(GL_TEXTURE_2D,textureMap.at(item->name));
+
+      // interpolation -> fragment covers multiple texels (texture pixel)
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLint( GL_LINEAR));
+      // interpolation -> fragment dosnt exaclty cover one texel
+      //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLint( GL_LINEAR));
+
+      glTexImage2D(GL_TEXTURE_2D,
+                   0,
+                   GLint(GL_RGBA),
+                   textureMap.at(item->name).width, textureMap.at(item->name).height,
+                   0,
+                   GL_RGBA,
+                   textureMap.at(item->name).channel_type,
+                   textureMap.at(item->name).data.data()
+      );
+       */
     }
   } // at the moment manualy added moon...
   textureMap.insert(std::make_pair(
