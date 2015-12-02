@@ -11,6 +11,7 @@ in vec2 pass_TextureCoordinate;
 out vec4 out_Color;
 
 uniform sampler2D Texture;
+uniform sampler2D NormalTexture;
 
 // moved const color into function
 const vec3 specColor = vec3(1.0, 1.0, 1.0);
@@ -24,7 +25,11 @@ void main(void)
 	vec3 ambientColor = pass_Color;
     vec3 diffuseColor = pass_Color;
 
+	// // Local normal, in tangent space - get 2fps
+	//vec3 TextureNormal_tangentspace = normalize(texture( NormalTexture, pass_TextureCoordinate ).rgb*2.0 - 1.0);
 	vec3 normal = normalize(normalInt); // normalInt and pass_Normal are both normalized and can be used.
+	//normal = TextureNormal_tangentspace;
+
 	vec3 lightDir = normalize(lightPos);
 
 	float lambertian = max(dot(lightDir,normal), 0.0);

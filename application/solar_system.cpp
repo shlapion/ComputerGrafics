@@ -94,6 +94,7 @@ GLint location_planet_color = -1;
 GLint location_sun_position = -1;
 GLint location_Shading_Option = -1;
 GLint location_Color_Sampler = -1;
+GLint location_Normal_Sampler = -1;
 
 // starCloud location
 GLint starCloud_view_matrix = -1;
@@ -496,8 +497,19 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   glUniform3f(location_planet_color, planet->color.r, planet->color.g, planet->color.b);
   glUniform1f(location_Shading_Option,Shading_Option);
 
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, textureMap.at(planet->name));
   glUniform1i(location_Color_Sampler,0);
+
+  /*
+  // get 2 fps!!!
+  glActiveTexture(GL_TEXTURE1);
+  // maybe for each one different texture mäp.... So we should store them in the Planet Struct
+  // http://cpetry.github.io/NormalMap-Online/
+  // http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-13-normal-mapping/
+  auto normalTexture = utils::texture_object( texture_loader::file( resource_path +"textures/png/Normal.png" ) );
+  glBindTexture(GL_TEXTURE_2D, normalTexture);
+  glUniform1i(location_Normal_Sampler,1);*/
 
   glBindVertexArray(planet_object.vertex_AO);
   utils::validate_program(planet_program);
@@ -630,6 +642,7 @@ void update_uniform_locations() {
   location_planet_color = glGetUniformLocation(planet_program, "ColorVec");
   location_Shading_Option = glGetUniformLocation(planet_program,"ShadingOption");
   location_Color_Sampler = glGetUniformLocation(planet_program,"Texture");
+  location_Normal_Sampler = glGetUniformLocation(planet_program,"NormalTexture");
 
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
   starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
