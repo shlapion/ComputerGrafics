@@ -108,6 +108,7 @@ std::string resource_path{};
 
 // holds the solar System
 std::vector<Planet*> solarSystem;
+std::map<std::string,GLuint> textureMap;
 
 
 /////////////////////////// forward declarations //////////////////////////////
@@ -124,6 +125,7 @@ void  generate_starCloud();
 void generate_orbits();
 
 model_object initialize_geometry( model & mod );
+model_object initialize_Planetgeometry( model & mod );
 
 void show_fps();
 void render();
@@ -276,6 +278,24 @@ void generate_solarSystem() {
   solarSystem.push_back(uranus);
   solarSystem.push_back(neptun);
 
+  // fill textureMap with texture Images from texture Folder
+  // Name of Planet must be the same in PNG Texture File.
+  for (auto & item : solarSystem) {
+    if (textureMap.find(item->name)==textureMap.end()) {
+      std::string name = item->name;
+      std::string filename = resource_path + "textures/png/"+ name +".png";
+
+      textureMap.insert(std::make_pair(
+              name,
+              utils::texture_object( texture_loader::file( filename ) ))
+              );
+    }
+  } // at the moment manualy added moon...
+  textureMap.insert(std::make_pair(
+          "moon",
+          utils::texture_object( texture_loader::file( resource_path +"textures/png/moon.png" ) ))
+  );
+
   float accumulatedSize = 0.0f;
   for (auto p:solarSystem) {
     if (p->is_root()) {
@@ -288,8 +308,8 @@ void generate_solarSystem() {
       //std::cout << p->name << ": " << p->distance << " next will be " << accumulatedSize << std::endl;
     }
   }
-  planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL);
-  planet_object = initialize_geometry(planet_model);
+  planet_model = model_loader::obj(resource_path + "models/Planet.obj", model::NORMAL | model::TEXCOORD);
+  planet_object = initialize_Planetgeometry(planet_model);
 }
 
 void  generate_starCloud() {
@@ -365,6 +385,43 @@ model_object initialize_geometry( model & mod ) {
   return object_;
 }
 
+model_object initialize_Planetgeometry( model & mod ) {
+
+  model_object object_;
+  // generate vertex array object
+  glGenVertexArrays(1, &object_.vertex_AO);
+  // bind the array for attaching buffers
+  glBindVertexArray(object_.vertex_AO);
+
+  // generate generic buffer
+  glGenBuffers(1, &object_.vertex_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ARRAY_BUFFER, object_.vertex_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mod.data.size(), mod.data.data(), GL_STATIC_DRAW);
+
+  // activate first attribute on gpu
+  glEnableVertexAttribArray(0);
+  // first attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(0, model::POSITION.components, (gl::GLenum) model::POSITION.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::POSITION]);
+  // activate second attribute on gpu
+  glEnableVertexAttribArray(1);
+  // second attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(1, model::NORMAL.components, (gl::GLenum) model::NORMAL.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::NORMAL]);
+// activate second attribute on gpu
+  glEnableVertexAttribArray(1);
+  // second attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(1, model::TEXCOORD.components, (gl::GLenum) model::TEXCOORD.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::TEXCOORD]);
+
+  // generate generic buffer
+  glGenBuffers(1, &object_.element_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object_.element_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * mod.indices.size(), mod.indices.data(), GL_STATIC_DRAW);
+
+  return object_;
+}
 
 ///////////////////////////// render functions ////////////////////////////////
 // render model
