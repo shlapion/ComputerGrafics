@@ -14,7 +14,7 @@ uniform sampler2D Texture;
 uniform sampler2D NormalTexture;
 
 // moved const color into function
-const vec3 specColor = vec3(1.0, 1.0, 1.0);
+const vec3 specColor = vec3(0.5, 0.5, 0.5);
 const float shininess = 16.0;
 const float screenGamma = 2.2;
 
@@ -47,7 +47,7 @@ void main(void)
 	vec3 TextureColor = (texture(Texture, pass_TextureCoordinate)).rgb; // without alpha
 
 	//vec3 colorLinear = ambientColor* vec3(0.1f) * TextureColor + lambertian * diffuseColor * TextureColor+ specular * specColor;
-	vec3 colorLinear = vec3(0.1f) * TextureColor + lambertian * TextureColor+ specular * specColor;
+	vec3 colorLinear = vec3(0.1f) * TextureColor + vec3(0.8f)* lambertian * TextureColor+ specular * specColor;
 
 	vec3 colorGammaCorrected = pow(colorLinear, vec3(1.0/screenGamma));
 
