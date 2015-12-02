@@ -115,7 +115,7 @@ void quit(int status);
 void update_view(GLFWwindow* window, int width, int height);
 void update_camera();
 void update_uniform_locations();
-void update_shader_programs();
+void update_shader_programs(bool throwing = false);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void cursor_callback(GLFWwindow * window, double x, double y);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -189,6 +189,8 @@ int main(int argc, char* argv[]) {
   // activate error checking after each gl function call
   utils::watch_gl_errors();
 
+  ///////////////////do not use gl* functions before this line!//////////////////
+
   //first argument is resource path
   if (argc > 1) {
     resource_path = argv[1];
@@ -202,7 +204,8 @@ int main(int argc, char* argv[]) {
   }
 
   // do before framebuffer_resize call as it requires the projection uniform location
-  update_shader_programs();
+  // throw exception if shader compilation was unsuccessfull
+  update_shader_programs(true);
 
   // initialize projection and view matrices
   int width, height;
@@ -491,39 +494,47 @@ void update_camera() {
 }
 
 // load shaders and update uniform locations
-void update_shader_programs() {
+void update_shader_programs(bool throwing) {
   /* defined at the top!!
     GLuint simple_program = 0;
     GLuint starCloud_program = 0;
     */
   std::vector<Shader_Programm> shaders;
   shaders.push_back({"shaders/simple.vert", "shaders/simple.frag", &planet_program});
-  shaders.push_back({"shaders/starCloud.vert","shaders/starCloud.frag", &starCloud_program});
-  shaders.push_back({"shaders/orbit.vert","shaders/orbit.frag", &orbit_program});
+  shaders.push_back({"shaders/starCloud.vert", "shaders/starCloud.frag", &starCloud_program});
+  shaders.push_back({"shaders/orbit.vert", "shaders/orbit.frag", &orbit_program});
 
-  try {
-    for (auto item : shaders) {
-      // throws exception when compiling was unsuccessful
-      GLuint new_program = shader_loader::program(resource_path + item.vertex_path,
-                                                  resource_path + item.frag_path);
-      // free old shader
-      glDeleteProgram(*item.programm);
-      // save new shader
-      *item.programm = new_program;
-      // bind shader
-      glUseProgram(*item.programm);
-      // after shader is recompiled uniform locations may change
+  // actual functionality in lambda to allow update with and without throwing
+  auto update_lambda = [&]() {
+      for (auto item : shaders) {
+        // throws exception when compiling was unsuccessful
+        GLuint new_program = shader_loader::program(resource_path + item.vertex_path,
+                                                    resource_path + item.frag_path);
+        // free old shader
+        glDeleteProgram(*item.programm);
+        // save new shader
+        *item.programm = new_program;
+        // bind shader
+        glUseProgram(*item.programm);
+        // after shader is recompiled uniform locations may change
 
+      }
+      update_uniform_locations();
+      // upload view uniforms to new shader
+      int width, height;
+      glfwGetFramebufferSize(window, &width, &height);
+      update_view(window, width, height);
+      update_camera();
+  };
+  if (throwing) {
+    update_lambda();
+  } else {
+    try {
+      update_lambda();
     }
-    update_uniform_locations();
-    // upload view uniforms to new shader
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    update_view(window, width, height);
-    update_camera();
-  }
-  catch(std::exception&) {
-    // don't crash, allow another try
+    catch (std::exception &) {
+      // don't crash, allow another try
+    }
   }
 }
 
