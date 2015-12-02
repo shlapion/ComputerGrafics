@@ -72,7 +72,7 @@ void main(void)
 
 	pass_Color = ColorVec;
 
-    lightPos = SunPosition;
+    lightPos = normalize(SunPosition - vertPos);
 
 	pass_shading_optin = ShadingOption;
 
