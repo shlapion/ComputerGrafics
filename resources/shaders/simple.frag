@@ -25,7 +25,7 @@ void main(void)
     vec3 diffuseColor = pass_Color;
 
 	vec3 normal = normalize(normalInt); // normalInt and pass_Normal are both normalized and can be used.
-	vec3 lightDir = normalize(lightPos - vertPos);
+	vec3 lightDir = normalize(lightPos);
 
 	float lambertian = max(dot(lightDir,normal), 0.0);
 	float specular = 0.0;

@@ -64,10 +64,10 @@ void main(void)
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f);
 
     vertPos = vec3(ViewMatrix  * vec4(in_Position,1.0));
-   
+
 
     // normalInt and pass_Normal is the same. And pass_Normal is better name convention
-	normalInt = normalize(vec3(NormalMatrix * vec4(in_Normal, 0.0)).xyz);
+	normalInt = vec3(NormalMatrix * vec4(in_Normal, 0.0));
 	pass_Normal = normalize(NormalMatrix * vec4(in_Normal,0.0f)).xyz;
 
 	pass_Color = ColorVec;
