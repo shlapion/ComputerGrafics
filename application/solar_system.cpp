@@ -488,7 +488,7 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
   //if (planet->name == "sun") std::cout <<  planet->name << " " << print(model_matrix) << std::endl;
   glUniformMatrix4fv(location_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
   // extra matrix for normal transformation to keep them orthogonal to surface
-  glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view * model_matrix));
+  glm::mat4 normal_matrix = glm::inverseTranspose(glm::inverse(camera_view) * model_matrix);
   glUniformMatrix4fv(location_normal_matrix, 1, GL_FALSE, glm::value_ptr(normal_matrix));
 
   // upload color
