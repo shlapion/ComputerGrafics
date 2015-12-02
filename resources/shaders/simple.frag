@@ -1,15 +1,16 @@
 #version 150
 
-in  vec4 pass_Normal;
+in vec3 pass_Normal;
 in vec3 pass_Color;
 in vec3 normalInt;
 in vec3 vertPos;
 
-in vec3 lightPos;
-
 in float pass_shading_optin;
-
+in vec3 lightPos;
+in vec2 pass_TextureCoordinate;
 out vec4 out_Color;
+
+uniform sampler2D Texture;
 
 // moved const color into function
 const vec3 specColor = vec3(1.0, 1.0, 1.0);
@@ -20,10 +21,10 @@ void main(void)
 {
 	if (pass_shading_optin == 1) { // Blinn Phong Shading Model
 
-	vec3 ambientColor = pass_Color; //vec3(0.1, 0.0, 0.0);
-    vec3 diffuseColor = pass_Color; //vec3(0.5, 0.0, 0.0);
+	vec3 ambientColor = pass_Color;
+    vec3 diffuseColor = pass_Color;
 
-	vec3 normal = normalize(normalInt);
+	vec3 normal = normalize(normalInt); // normalInt and pass_Normal are both normalized and can be used.
 	vec3 lightDir = normalize(lightPos - vertPos);
 
 	float lambertian = max(dot(lightDir,normal), 0.0);
@@ -38,7 +39,9 @@ void main(void)
 		specular = pow(specAngle, shininess);	
 	}
 
-	vec3 colorLinear = ambientColor* vec3(0.1f) + lambertian * diffuseColor + specular * specColor;
+	vec3 TextureColor = (texture(Texture, pass_TextureCoordinate)).rgb; // without alpha
+
+	vec3 colorLinear = ambientColor* vec3(0.1f) * TextureColor + lambertian * diffuseColor * TextureColor+ specular * specColor;
 
 	vec3 colorGammaCorrected = pow(colorLinear, vec3(1.0/screenGamma));
 
@@ -49,8 +52,8 @@ void main(void)
         const float C = 0.6;
         const float D = 1.0;
 
-        	vec3 ambientColor = pass_Color; //vec3(0.1, 0.0, 0.0);
-            vec3 diffuseColor = pass_Color; //vec3(0.5, 0.0, 0.0);
+        	vec3 ambientColor = pass_Color;
+            vec3 diffuseColor = pass_Color;
 
         	vec3 normal = normalize(normalInt); //N
         	vec3 lightDir = normalize(lightPos); //L

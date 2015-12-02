@@ -3,6 +3,7 @@
 // vertex attributes of VAO
 layout(location=0) in vec3 in_Position;
 layout(location=1) in vec3 in_Normal;
+layout(location=2) in vec2 in_TextureCoordinate;
 /*
     The in modifier is used to qualify inputs into a shader stage.
     Those inputs may be vertex attributes (for vertex shaders),
@@ -43,12 +44,14 @@ BaseColor in the table, which is done using the
 glGetUniformLocation() routine.
 */
 
-out vec4 pass_Normal;
+// should maybe renamed in pass_*
+out vec3 pass_Normal;
 out vec3 vertPos;
 out vec3 normalInt;
 out vec3 pass_Color;
 out float pass_shading_optin;
 out vec3 lightPos;
+out vec2 pass_TextureCoordinate;
 /*
     The out modifier is used to qualify outputs from a shader
     stage - for example, the transformed homogeneous coordinates
@@ -63,10 +66,15 @@ void main(void)
     vertPos = vec3((ViewMatrix * ModelMatrix) * vec4(in_Position,1.0));
     //vertPos = vec3(vertPos4) / vertPos4.w;
 
+    // normalInt and pass_Normal is the same. And pass_Normal is better name convention
 	normalInt = normalize(vec3(NormalMatrix * vec4(in_Normal, 0.0)).xyz);
+	pass_Normal = normalize(NormalMatrix * vec4(in_Normal,0.0f)).xyz;
+
 	pass_Color = ColorVec;
 
     lightPos = SunPosition;
 
 	pass_shading_optin = ShadingOption;
+
+    pass_TextureCoordinate = in_TextureCoordinate;
 }
