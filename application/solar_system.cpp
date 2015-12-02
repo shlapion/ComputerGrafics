@@ -91,6 +91,7 @@ GLint location_model_matrix = -1;
 GLint location_view_matrix = -1;
 GLint location_projection_matrix = -1;
 GLint location_planet_color = -1;
+GLint location_sun_position = -1;
 GLint location_Shading_Option = -1;
 
 // starCloud location
@@ -476,6 +477,10 @@ void update_camera() {
   glm::mat4 inv_camera_view = glm::inverse(camera_view);
   // upload matrix to gpu
   glUseProgram(planet_program);
+  glm::vec4 sun = {0.0f, 0.0f, 0.0f, 1.0f};
+  sun = inv_camera_view * sun;
+
+  glUniform3f(location_sun_position, sun.x,sun.y,sun.z);
   glUniformMatrix4fv(location_view_matrix, 1, GL_FALSE, glm::value_ptr(inv_camera_view));
 
   glUseProgram(starCloud_program);

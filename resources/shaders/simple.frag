@@ -5,11 +5,12 @@ in vec3 pass_Color;
 in vec3 normalInt;
 in vec3 vertPos;
 
+in vec3 lightPos;
+
 in float pass_shading_optin;
 
 out vec4 out_Color;
 
-const vec3 lightPos = vec3(0.0,0.0,0.0);
 // moved const color into function
 const vec3 specColor = vec3(1.0, 1.0, 1.0);
 const float shininess = 16.0;
@@ -23,7 +24,7 @@ void main(void)
     vec3 diffuseColor = pass_Color; //vec3(0.5, 0.0, 0.0);
 
 	vec3 normal = normalize(normalInt);
-	vec3 lightDir = normalize(lightPos -vertPos);
+	vec3 lightDir = normalize(lightPos - vertPos);
 
 	float lambertian = max(dot(lightDir,normal), 0.0);
 	float specular = 0.0;

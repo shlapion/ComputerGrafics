@@ -18,6 +18,7 @@ uniform mat4 ProjectionMatrix;
 uniform mat4 NormalMatrix;
 uniform vec3 ColorVec;
 
+uniform vec3 SunPosition;
 uniform float ShadingOption;
 /*
     The uniform modifier specifies that a variable’s value will be
@@ -47,6 +48,7 @@ out vec3 vertPos;
 out vec3 normalInt;
 out vec3 pass_Color;
 out float pass_shading_optin;
+out vec3 lightPos;
 /*
     The out modifier is used to qualify outputs from a shader
     stage - for example, the transformed homogeneous coordinates
@@ -54,17 +56,17 @@ out float pass_shading_optin;
     fragment shader.
 */
 
-
 void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0f);
 
-	vec4 vertPos4 = ModelMatrix * vec4(in_Position, 1.0);
     vertPos = vec3((ViewMatrix * ModelMatrix) * vec4(in_Position,1.0));
     //vertPos = vec3(vertPos4) / vertPos4.w;
 
-	normalInt = vec3(NormalMatrix * vec4(in_Normal, 0.0));
+	normalInt = normalize(vec3(NormalMatrix * vec4(in_Normal, 0.0)).xyz);
 	pass_Color = ColorVec;
+
+    lightPos = SunPosition;
 
 	pass_shading_optin = ShadingOption;
 }
