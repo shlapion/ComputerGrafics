@@ -93,6 +93,7 @@ GLint location_projection_matrix = -1;
 GLint location_planet_color = -1;
 GLint location_sun_position = -1;
 GLint location_Shading_Option = -1;
+GLint location_Color_Sampler = -1;
 
 // starCloud location
 GLint starCloud_view_matrix = -1;
@@ -409,9 +410,9 @@ model_object initialize_Planetgeometry( model & mod ) {
   // second attribute is 3 floats with no offset & stride
   glVertexAttribPointer(1, model::NORMAL.components, (gl::GLenum) model::NORMAL.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::NORMAL]);
 // activate second attribute on gpu
-  glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
   // second attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(1, model::TEXCOORD.components, (gl::GLenum) model::TEXCOORD.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::TEXCOORD]);
+  glVertexAttribPointer(2, model::TEXCOORD.components, (gl::GLenum) model::TEXCOORD.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::TEXCOORD]);
 
   // generate generic buffer
   glGenBuffers(1, &object_.element_BO);
@@ -472,6 +473,9 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) 
 
   glUniform3f(location_planet_color, planet->color.r, planet->color.g, planet->color.b);
   glUniform1f(location_Shading_Option,Shading_Option);
+
+  glBindTexture(GL_TEXTURE_2D, textureMap.at(planet->name));
+  glUniform1i(location_Color_Sampler,0);
 
   glBindVertexArray(planet_object.vertex_AO);
   utils::validate_program(planet_program);
@@ -603,6 +607,7 @@ void update_uniform_locations() {
   location_projection_matrix = glGetUniformLocation(planet_program, "ProjectionMatrix");
   location_planet_color = glGetUniformLocation(planet_program, "ColorVec");
   location_Shading_Option = glGetUniformLocation(planet_program,"ShadingOption");
+  location_Color_Sampler = glGetUniformLocation(planet_program,"Texture");
 
   starCloud_projection_matrix = glGetUniformLocation(starCloud_program, "ProjectionMatrix");
   starCloud_view_matrix = glGetUniformLocation(starCloud_program, "ViewMatrix");
