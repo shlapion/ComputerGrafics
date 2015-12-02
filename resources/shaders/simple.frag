@@ -47,10 +47,10 @@ void main(void)
 
     out_Color = vec4(colorGammaCorrected, 1.0);
     } else if (pass_shading_optin == 2 ){
-		const float A = 0.1;
-        const float B = 0.3;
-        const float C = 0.6;
-        const float D = 1.0;
+		 float A = 0.1;
+         float B = 0.3;
+         float C = 0.6;
+         float D = 1.0;
 
         	vec3 ambientColor = pass_Color;
             vec3 diffuseColor = pass_Color;
