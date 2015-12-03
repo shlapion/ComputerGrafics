@@ -255,7 +255,7 @@ void generate_solarSystem() {
 
     //                         name,  distance,  speed, size, type [sun,planet,moon]
   Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,AU_scale *  9.90f};
-  Planet* milkyway = new Planet{"milkyway", 0.0f, 0.0f, AU_scale * 1000};
+  Planet* milkyway = new Planet{"milkyway", 0.0f, 0.0f, AU_scale * 10000};
   Planet* mercury = new Planet{"mercury",  0.4f*AU,2.5f,AU_scale *  0.3829f,"planet",{0.91f,0.78f,0.65f}};
   Planet* venus =   new Planet{"venus",    0.7f*AU,2.0f,AU_scale *  0.9499f,"planet",{0.88f,0.56f,0.18f}};
   Planet* earth =   new Planet{"earth",         AU,1.2f,AU_scale *  1.0f,"planet",{0.40f,0.78f,1.00f}};
