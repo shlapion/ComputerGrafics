@@ -461,14 +461,17 @@ void render() {
 
   glUseProgram(planet_program);
   Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,9.90f};
-  glm::mat4 translation_sun{};
+  Planet* milkyway = new Planet{"milkyway", 0.0f, 0.0f, AU_scale * 1000};
+  glm::mat4 translation_sun{};glm::mat4 translation_milkyway{};
   render_Planet(sun,translation_sun,0);
+  render_Planet(milkyway,translation_milkyway,0);
+
   for (auto const &p : solarSystem) {
     float time = float(glfwGetTime());
     Planet* current = p;
     glm::mat4 translation;
     glm::vec3 position;
-    if (p->name!="sun") render_Planet(p, translation, time);
+    if (p->name!="sun"&p->name!="milkyway") render_Planet(p, translation, time);
   }
 
 
