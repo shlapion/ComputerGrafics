@@ -114,6 +114,13 @@ GLint orbit_model_matrix = -1;
 GLint orbit_view_matrix = -1;
 GLint orbit_projection_matrix = -1;
 
+// screen quad locations
+GLint squad_location_texture_coordinate = -1;
+GLint squad_location_greyscale = -1;
+GLint squad_location_flipvertical = -1;
+GLint squad_location_fliphorizontal = -1;
+GLint squad_location_gaussian = -1;
+
 // path to the resource folders
 std::string resource_path{};
 
@@ -701,6 +708,12 @@ void update_uniform_locations() {
   orbit_model_matrix = glGetUniformLocation(orbit_program, "ModelMatrix");
   orbit_view_matrix = glGetUniformLocation(orbit_program, "ViewMatrix");
   orbit_projection_matrix = glGetUniformLocation(orbit_program, "ProjectionMatrix");
+
+  squad_location_texture_coordinate = glGetUniformLocation(screenQuad_program, "textureCoord");
+  squad_location_greyscale = glGetUniformLocation(screenQuad_program, "isGreyscale");
+  squad_location_flipvertical = glGetUniformLocation(screenQuad_program, "isFlippedVertical");
+  squad_location_fliphorizontal = glGetUniformLocation(screenQuad_program, "isFlippedHorizontal");
+  squad_location_gaussian = glGetUniformLocation(screenQuad_program, "isGaussianblurred");
 }
 
 ///////////////////////////// misc functions ////////////////////////////////
