@@ -564,6 +564,12 @@ void update_view(GLFWwindow* window, int width, int height) {
                             GL_DEPTH_ATTACHMENT / GL_STENCIL_ATTACHMENT,
                             GL_RENDERBUFFER, rb_handle);
 
+  // define the index array for the outputs
+  GLuint attachments[2] = { GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+  glDrawBuffers(2,  attachments);
+
+  
+
 
   // resize framebuffer
   glViewport(0, 0, width, height);
