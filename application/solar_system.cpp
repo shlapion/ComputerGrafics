@@ -568,7 +568,9 @@ void update_view(GLFWwindow* window, int width, int height) {
   GLuint attachments[2] = { GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
   glDrawBuffers(2,  attachments);
 
-  
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE)
+    printf("There is an error in the FBO\n");
 
 
   // resize framebuffer
