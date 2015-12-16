@@ -545,7 +545,7 @@ void update_view(GLFWwindow* window, int width, int height) {
   GLuint fbo, tex_handle, rb_handle;
 
   // create a RGB color texture
-  glGenTextures(1, tex_handle);
+  glGenTextures(1, &tex_handle);
   glBindTexture(GL_TEXTURE_2D, tex_handle);
 
 
@@ -556,16 +556,16 @@ void update_view(GLFWwindow* window, int width, int height) {
 
   // attach color
   glFramebufferTexture(GL_FRAMEBUFFER,
-                       GL_COLOR_ATTACHMENT0 / GL_DEPTH_ATTACHMENT,
+                       GL_DEPTH_ATTACHMENT,
                        tex_handle,
                        0);
 
   glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-                            GL_DEPTH_ATTACHMENT / GL_STENCIL_ATTACHMENT,
+                            GL_DEPTH_ATTACHMENT,
                             GL_RENDERBUFFER, rb_handle);
 
   // define the index array for the outputs
-  GLuint attachments[2] = { GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+  GLenum attachments[2] = { GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
   glDrawBuffers(2,  attachments);
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
