@@ -502,6 +502,8 @@ void render() {
       render_orbit(p, deltaDistance);
   }
 
+  render_screenQuad();
+
 }
 
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
@@ -553,6 +555,16 @@ void render_orbit(Planet* const& planet, float delta) {
   glBindVertexArray(orbit_object.vertex_AO);
   utils::validate_program(orbit_program);
   glDrawArrays(GL_LINES,0,number_of_orbitFragment);
+}
+
+void render_screenQuad() {
+  glUseProgram(screenQuad_program);
+  //glActiveTexture(GL_TEXTURE0);
+  //glBindTexture(GL_TEXTURE_2D,screenQuadTexture);
+
+  glBindVertexArray(screenQuad_object.vertex_AO);
+  utils::validate_program(screenQuad_program);
+  glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }
 
 ///////////////////////////// update functions ////////////////////////////////
