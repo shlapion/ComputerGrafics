@@ -540,6 +540,15 @@ void render_orbit(Planet* const& planet, float delta) {
 ///////////////////////////// update functions ////////////////////////////////
 // update viewport and field of view
 void update_view(GLFWwindow* window, int width, int height) {
+
+
+  GLuint fbo;
+// generate a framebuffer
+  glGenFramebuffers(1, &fbo);
+// bind it as the target for rendering commands
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+
   // resize framebuffer
   glViewport(0, 0, width, height);
 
