@@ -780,25 +780,29 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
   else if (key==GLFW_KEY_7 && action == GLFW_PRESS) {
     // luminance preserving greyscale image
     is_greyscale = !is_greyscale;
-    //use programm
+    glUseProgram(screenQuad_program);
+    glUniform1i(squad_location_greyscale , is_greyscale);
     //upload boolian
   }
   else if (key==GLFW_KEY_8 && action == GLFW_PRESS) {
     // horizontal mirrored image
     is_flipped_horizontal = !is_flipped_horizontal;
-    //use programm
+    glUseProgram(screenQuad_program);
+    glUniform1i(squad_location_fliphorizontal , is_flipped_horizontal);
     //upload boolian
   }
   else if (key==GLFW_KEY_9 && action == GLFW_PRESS) {
     // vertical mirrored image
     is_flipped_vertical = !is_flipped_vertical;
-    //use programm
+    glUseProgram(screenQuad_program);
+    glUniform1i(squad_location_flipvertical , is_flipped_vertical);
     //upload boolian
   }
   else if (key==GLFW_KEY_0 && action == GLFW_PRESS) {
     // blurred image with 3x3 gaussian kernel
     is_gaussianblurred = !is_gaussianblurred;
-    //use programm
+    glUseProgram(screenQuad_program);
+    glUniform1i(squad_location_gaussian , is_gaussianblurred);
     //upload boolian
   }
 //  else if(key==GLFW_KEY_9 && action == GLFW_PRESS) {
