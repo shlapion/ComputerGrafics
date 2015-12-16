@@ -1,13 +1,18 @@
 #version 150
 
-const vec2 madd=vec2(0.5,0.5);
-attribute vec2 vertexIn;
-varying vec2 textureCoord;
+#extension GL_ARB_explicit_attrib_location : require
+// vertex attributes of VAO
+layout(location=0) in vec3 in_Position;
+layout(location=1) in vec3 in_Normal;
+layout(location=2) in vec2 in_TextureCoordinate;
+
+out vec2 pass_TextureCoordinate;
 
 
 void main() {
 
-   textureCoord = vertexIn.xy*madd+madd; // scale vertex attribute to [0-1] range
-   gl_Position = vec4(vertexIn.xy,0.0,1.0);
+
+   gl_Position = vec4(in_Position, 1.0);
+   pass_TextureCoordinate = in_TextureCoordinate;
 
 }
