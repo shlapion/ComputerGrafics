@@ -542,17 +542,21 @@ void render_orbit(Planet* const& planet, float delta) {
 void update_view(GLFWwindow* window, int width, int height) {
 
 
-  GLuint fbo, tex_handle, rb_handle;
+  GLuint fbo_handle, tex_handle, rb_handle;
 
   // create a RGB color texture
   glGenTextures(1, &tex_handle);
   glBindTexture(GL_TEXTURE_2D, tex_handle);
 
+  // generate renderbuffer
+  glGenRenderbuffers(1,&rb_handle);
+  glBindRenderbuffer(GL_RENDERBUFFER, rb_handle);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 
   // generate a framebuffer
-  glGenFramebuffers(1, &fbo);
+  glGenFramebuffers(1, &fbo_handle);
 // bind it as the target for rendering commands
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo_handle);
 
   // attach color
   glFramebufferTexture(GL_FRAMEBUFFER,
