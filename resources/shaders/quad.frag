@@ -2,9 +2,22 @@
 
 varying vec2 textureCoord;
 
-void main() {
+uniform bool is_greyscale;
+uniform bool is_flipped_vertical;
+uniform bool is_flipped_horizontal;
+uniform bool is_gaussianblurred;
 
+out vec4 out_Color;
+
+void main() {
+   vec4 color =vec4(0.0f); // color.rgba
+   if (is_greyscale) {
+     color = vec4(dot(vec3(0.2126,0.7152,0.0722),color.rgb),color.a);
+   }
+   
    vec4 color1 = texture2D(t,textureCoord);
    gl_FragColor = color1;
+
+   out_Color = color;
 
 }

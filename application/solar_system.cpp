@@ -39,6 +39,10 @@ const int number_of_stars = 10000;
 float speed_time = 1.0f;
 
 float Shading_Option = 1; // at the moment 1 for Blinn-Phong and 2 for Toon
+bool is_greyscale = false;
+bool is_flipped_vertical = false;
+bool is_flipped_horizontal = false;
+bool is_gaussianblurred = false;
 
 //const int number_of_orbitFragment = 3.6*50000;
 const int number_of_orbitFragment = 50000;
@@ -65,6 +69,7 @@ unsigned frames_per_second = 0;
 GLuint planet_program = 0;
 GLuint starCloud_program = 0;
 GLuint orbit_program = 0;
+GLuint screenQuad_program = 0;
 
 // cpu representation of model
 model planet_model{};
@@ -80,6 +85,10 @@ struct model_object {
 model_object planet_object;
 model_object starfield_object;
 model_object orbit_object;
+model_object screenQuad_object;
+
+// framebuffer handler
+GLuint fbo_handle, tex_handle, rb_handle;
 
 // camera matrices
 glm::mat4 camera_view = glm::translate(glm::mat4{}, glm::vec3{50.0f, 30.0f, 150.0f});
@@ -125,6 +134,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void generate_solarSystem();
 void  generate_starCloud();
 void generate_orbits();
+void generate_screenQuad();
 
 model_object initialize_geometry( model & mod );
 model_object initialize_Planetgeometry( model & mod );
@@ -135,6 +145,7 @@ void render();
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time);
 //void render_starfield();
 void render_orbit(Planet* const& planet, float delta);
+void render_screenQuad();
 
 std::string print(glm::mat4 mat) {
   std::string os ="\n{ \n";    // more generic version? - a mat type for every
@@ -541,9 +552,6 @@ void render_orbit(Planet* const& planet, float delta) {
 // update viewport and field of view
 void update_view(GLFWwindow* window, int width, int height) {
 
-
-  GLuint fbo_handle, tex_handle, rb_handle;
-
   // create a RGB color texture
   glGenTextures(1, &tex_handle);
   glBindTexture(GL_TEXTURE_2D, tex_handle);
@@ -640,6 +648,7 @@ void update_shader_programs(bool throwing) {
   shaders.push_back({"shaders/simple.vert", "shaders/simple.frag", &planet_program});
   shaders.push_back({"shaders/starCloud.vert", "shaders/starCloud.frag", &starCloud_program});
   shaders.push_back({"shaders/orbit.vert", "shaders/orbit.frag", &orbit_program});
+  shaders.push_back({"shaders/quad.vert", "shaders/quad.frag", &screenQuad_program});
 
   // actual functionality in lambda to allow update with and without throwing
   auto update_lambda = [&]() {
@@ -755,13 +764,37 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera_view = glm::rotate(camera_view, -0.1f, glm::vec3{0.0f, 0.0f, -0.1f*AU});
     update_camera();
   }
-  else if(key==GLFW_KEY_9 && action == GLFW_PRESS) {
-    glClearColor(1.0f,1.0f,1.0f,1.0f);
+  else if (key==GLFW_KEY_7 && action == GLFW_PRESS) {
+    // luminance preserving greyscale image
+    is_greyscale = !is_greyscale;
+    //use programm
+    //upload boolian
   }
-  else if(key==GLFW_KEY_8 && action == GLFW_PRESS) {
-    glClearColor(0.0f,0.0f,0.0f,1.0f);
-    // at the moment i don't know exactly how to change color of stars
+  else if (key==GLFW_KEY_8 && action == GLFW_PRESS) {
+    // horizontal mirrored image
+    is_flipped_horizontal = !is_flipped_horizontal;
+    //use programm
+    //upload boolian
   }
+  else if (key==GLFW_KEY_9 && action == GLFW_PRESS) {
+    // vertical mirrored image
+    is_flipped_vertical = !is_flipped_vertical;
+    //use programm
+    //upload boolian
+  }
+  else if (key==GLFW_KEY_0 && action == GLFW_PRESS) {
+    // blurred image with 3x3 gaussian kernel
+    is_gaussianblurred = !is_gaussianblurred;
+    //use programm
+    //upload boolian
+  }
+//  else if(key==GLFW_KEY_9 && action == GLFW_PRESS) {
+//    glClearColor(1.0f,1.0f,1.0f,1.0f);
+//  }
+//  else if(key==GLFW_KEY_8 && action == GLFW_PRESS) {
+//    glClearColor(0.0f,0.0f,0.0f,1.0f);
+//    // at the moment i don't know exactly how to change color of stars
+//  }
   else if (key==GLFW_KEY_P && action == GLFW_PRESS) {
     std::cout << "Print Camera_View Matrix "<< print(camera_view) << std::endl;
   }
@@ -845,6 +878,8 @@ void quit(int status) {
   glDeleteBuffers(1, &orbit_object.vertex_BO);
   glDeleteVertexArrays(1, &orbit_object.element_BO);
   glDeleteVertexArrays(1, &orbit_object.vertex_AO);
+
+  // glDeleteFramebuffers(1,GL_RENDERBUFFER);
 
   // free glfw resources
   glfwDestroyWindow(window);
