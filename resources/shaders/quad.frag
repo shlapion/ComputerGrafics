@@ -1,33 +1,36 @@
 #version 150
 
-in vec2 pass_textureCoordinate;
+uniform sampler2D Texture;
 
 uniform bool isGreyscale;
 uniform bool isFlippedVertical;
 uniform bool isFlippedHorizontal;
 uniform bool isGaussianblurred;
 
+in vec2 pass_TextureCoordinate;
+
 out vec4 out_Color;
 
 void main() {
-   vec4 color =vec4(0.0f); // color.rgba
+
+   vec2 textureCoordinates = pass_TextureCoordinate;
+
+
    if (isGreyscale) {
-     color = vec4(dot(vec3(0.2126,0.7152,0.0722),color.rgb),color.a);
+     color = vec4(vec3(dot(0.2126,0.7152,0.0722),color.rgb),color.a);
    }
 
    if (isFlippedHorizontal) {
-     pass_textureCoordinate = vec2(1.0f-pass_textureCoordinate.x, pass_textureCoordinate.y);
+     textureCoordinates = vec2(1.0f-textureCoordinates.x, textureCoordinates.y);
    }
    if (isFlippedVertical) {
-     pass_textureCoordinate = vec2(pass_textureCoordinate.x, 1.0f-pass_textureCoordinate.y);
+     textureCoordinates = vec2(textureCoordinates.x, 1.0f-textureCoordinates.y);
    }
 
    if (isGaussianblurred) {
      //color =
    }
 
-   vec4 color1 = texture2D(t,pass_textureCoordinate);
-   gl_FragColor = color1;
 
    out_Color = color;
 
