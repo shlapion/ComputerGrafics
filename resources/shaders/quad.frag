@@ -10,6 +10,7 @@ uniform bool isGaussianblurred;
 in vec2 pass_TextureCoordinate;
 
 out vec4 out_Color;
+const vec3 luminance = vec3(0.2126f,0.7152f,0.0722f);
 
 void main() {
 
@@ -17,7 +18,7 @@ void main() {
 
 
    if (isGreyscale) {
-     color = vec4(vec3(dot(0.2126,0.7152,0.0722),color.rgb),color.a);
+     color = vec4(vec3(dot(luminance,color.rgb)),color.a);
    }
 
    if (isFlippedHorizontal) {
