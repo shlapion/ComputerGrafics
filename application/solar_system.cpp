@@ -587,7 +587,7 @@ void update_view(GLFWwindow* window, int width, int height) {
 
   // attach color
   glFramebufferTexture(GL_FRAMEBUFFER,
-                       GL_DEPTH_ATTACHMENT,
+                       GL_COLOR_ATTACHMENT0,
                        tex_handle,
                        0);
 
@@ -596,8 +596,8 @@ void update_view(GLFWwindow* window, int width, int height) {
                             GL_RENDERBUFFER, rb_handle);
 
   // define the index array for the outputs
-  GLenum attachments[2] = { GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-  glDrawBuffers(2,  attachments);
+  GLenum attachments[1] = { GL_COLOR_ATTACHMENT0};
+  glDrawBuffers(1,  attachments);
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE)
