@@ -139,12 +139,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void cursor_callback(GLFWwindow * window, double x, double y);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void generate_solarSystem();
-void  generate_starCloud();
+void generate_starCloud();
 void generate_orbits();
 void generate_screenQuad();
 
 model_object initialize_geometry( model & mod );
 model_object initialize_Planetgeometry( model & mod );
+
+void initialize_buffers(int width, int height);
 
 void show_fps();
 void render();
@@ -234,6 +236,8 @@ int main(int argc, char* argv[]) {
   glfwGetFramebufferSize(window, &width, &height);
   update_view(window, width, height);
   update_camera();
+
+  initialize_buffers(width, height);
 
   // set up models
   generate_solarSystem();
@@ -567,13 +571,25 @@ void render_screenQuad() {
   glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }
 
-///////////////////////////// update functions ////////////////////////////////
-// update viewport and field of view
-void update_view(GLFWwindow* window, int width, int height) {
-
+void initialize_buffers(int width, int height) {
   // create a RGB color texture
   glGenTextures(1, &tex_handle);
   glBindTexture(GL_TEXTURE_2D, tex_handle);
+
+  // interpolation -> fragment covers multiple texels (texture pixel)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLint( GL_LINEAR));
+  // interpolation -> fragment dosnt exaclty cover one texel
+  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLint( GL_LINEAR));
+
+  glTexImage2D(GL_TEXTURE_2D,
+               0,
+               GLint(GL_RGBA),
+               width, height,
+               0,
+               GL_RGBA,
+               GL_FLOAT,
+               &tex_handle
+  );
 
   // generate renderbuffer
   glGenRenderbuffers(1,&rb_handle);
@@ -582,27 +598,38 @@ void update_view(GLFWwindow* window, int width, int height) {
 
   // generate a framebuffer
   glGenFramebuffers(1, &fbo_handle);
-// bind it as the target for rendering commands
+  // bind it as the target for rendering commands
   glBindFramebuffer(GL_FRAMEBUFFER, fbo_handle);
+
+  // Fraebuffer nur einmal erstellen
+  //  somit in eigene init.
+  // Texturen erstellen und laden
 
   // attach color
   glFramebufferTexture(GL_FRAMEBUFFER,
-                       GL_COLOR_ATTACHMENT0,
+                       GL_COLOR_ATTACHMENT0, // or GL_DEPTH_ATTACHMENT
                        tex_handle,
                        0);
 
   glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-                            GL_DEPTH_ATTACHMENT,
+                            GL_DEPTH_ATTACHMENT, // or GL_STENCIL_ATTACHMENT
                             GL_RENDERBUFFER, rb_handle);
 
   // define the index array for the outputs
-  GLenum attachments[1] = { GL_COLOR_ATTACHMENT0};
-  glDrawBuffers(1,  attachments);
+  // 1 or n
+  GLenum draw_buffers[1] = { GL_COLOR_ATTACHMENT0};
+  glDrawBuffers(1,  draw_buffers);
 
   GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
   if (status != GL_FRAMEBUFFER_COMPLETE)
     printf("There is an error in the FBO\n");
+  // throwning a bit better.... maybe...
 
+}
+
+///////////////////////////// update functions ////////////////////////////////
+// update viewport and field of view
+void update_view(GLFWwindow* window, int width, int height) {
 
   // resize framebuffer
   glViewport(0, 0, width, height);
