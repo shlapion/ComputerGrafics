@@ -82,10 +82,18 @@ struct model_object {
   GLuint vertex_BO = 0;
   GLuint element_BO = 0;
 };
+
+struct quad_object {
+    GLuint vertex_AO = 0;
+    GLuint vertex_BO = 0;
+    GLuint element_BO = 0;
+};
+
+
 model_object planet_object;
 model_object starfield_object;
 model_object orbit_object;
-model_object screenQuad_object;
+quad_object screenQuad_object;
 
 // framebuffer handler
 GLuint fbo_handle, tex_handle, rb_handle;
