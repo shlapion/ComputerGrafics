@@ -154,6 +154,7 @@ void initScreenQuad();
 
 model_object initialize_geometry( model & mod );
 model_object initialize_Planetgeometry( model & mod );
+quad_object initialize_Quad( model & mod );
 
 void initialize_buffers(int width, int height);
 
@@ -493,6 +494,37 @@ model_object initialize_Planetgeometry( model & mod ) {
   return object_;
 }
 
+quad_object initialize_Quad( model & mod ){
+  quad_object object_;
+  // generate vertex array object
+  glGenVertexArrays(1, &object_.vertex_AO);
+  // bind the array for attaching buffers
+  glBindVertexArray(object_.vertex_AO);
+
+  // generate generic buffer
+  glGenBuffers(1, &object_.vertex_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ARRAY_BUFFER, object_.vertex_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mod.data.size(), mod.data.data(), GL_STATIC_DRAW);
+
+  // activate first attribute on gpu
+  glEnableVertexAttribArray(0);
+  // first attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(0, model::POSITION.components, (gl::GLenum) model::POSITION.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::POSITION]);
+  // activate second attribute on gpu
+  glEnableVertexAttribArray(1);
+  // second attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(1, model::NORMAL.components, (gl::GLenum) model::NORMAL.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::NORMAL]);
+// activate second attribute on gpu
+  glEnableVertexAttribArray(2);
+  // second attribute is 3 floats with no offset & stride
+  glVertexAttribPointer(2, model::TEXCOORD.components, (gl::GLenum) model::TEXCOORD.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::TEXCOORD]);
+
+
+  return object_;
+}
+
 ///////////////////////////// render functions ////////////////////////////////
 // render model
 //Actual size of the planets referenced to the earth.
@@ -585,7 +617,7 @@ void render_orbit(Planet* const& planet, float delta) {
 
 void render_screenQuad() {
   glUseProgram(screenQuad_program);
-  //glActiveTexture(GL_TEXTURE0);
+  glActiveTexture(GL_TEXTURE0);
   //glBindTexture(GL_TEXTURE_2D,screenQuadTexture);
 
   glBindVertexArray(screenQuad_object.vertex_AO);
