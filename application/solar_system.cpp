@@ -142,6 +142,7 @@ void generate_solarSystem();
 void generate_starCloud();
 void generate_orbits();
 void generate_screenQuad();
+void initScreenQuad();
 
 model_object initialize_geometry( model & mod );
 model_object initialize_Planetgeometry( model & mod );
@@ -395,6 +396,19 @@ void generate_orbits() {
   }
   orbit_model = {orbVec, model::POSITION|model::NORMAL};
   orbit_object= initialize_geometry(orbit_model);
+}
+
+
+
+void initScreenQuad() {
+
+  std::vector<GLfloat> vertices
+          {
+                  -1.0f, -1.0f, 0.0f, 0.0f, 0.0f, //vertice1
+                  1.0f, -1.0f, 0.0f, 1.0f, 0.0f, //vertice2
+                  -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, //vertice3
+                  1.0f, 1.0f,0.0f, 1.0f, 1.0f //vertice4
+          };
 }
 
 ///////////////////////// initialisation functions ////////////////////////////
