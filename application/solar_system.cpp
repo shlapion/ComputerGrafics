@@ -123,7 +123,7 @@ GLint orbit_view_matrix = -1;
 GLint orbit_projection_matrix = -1;
 
 // screen quad locations
-GLint squad_location_texture_coordinate = -1;
+
 GLint squad_location_greyscale = -1;
 GLint squad_location_flipvertical = -1;
 GLint squad_location_fliphorizontal = -1;
@@ -142,21 +142,26 @@ void quit(int status);
 void update_view(GLFWwindow* window, int width, int height);
 void update_camera();
 void update_uniform_locations();
+
 void update_shader_programs(bool throwing = false);
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void cursor_callback(GLFWwindow * window, double x, double y);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
 void generate_solarSystem();
 void generate_starCloud();
 void generate_orbits();
-void generate_screenQuad();
+
 void initScreenQuad();
+void initialize_geometry();
 
 model_object initialize_geometry( model & mod );
 model_object initialize_Planetgeometry( model & mod );
-quad_object initialize_Quad( model & mod );
 
-void initialize_buffers(int width, int height);
+
+void init_render_buffer(GLsizei width, GLsizei height);
+void init_frame_buffers(GLsizei width, GLsizei height);
 
 void show_fps();
 void render();
@@ -165,6 +170,62 @@ void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time);
 //void render_starfield();
 void render_orbit(Planet* const& planet, float delta);
 void render_screenQuad();
+
+
+
+void init_render_buffer (GLsizei width, GLsizei height)
+{
+  glGenRenderbuffers(1, &rb_handle);
+  glBindRenderbuffer(GL_RENDERBUFFER, rb_handle);
+  glRenderbufferStorage(GL_RENDERBUFFER,
+                        GL_DEPTH_COMPONENT24,
+                        width,
+                        height
+  );
+
+}
+
+void init_frame_buffers (GLsizei width, GLsizei height)
+{
+  glGenTextures(1, &tex_handle);
+  glBindTexture(GL_TEXTURE_2D, tex_handle);
+
+  // set texture sampling parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLint(GL_LINEAR));
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLint(GL_LINEAR));
+  glTexImage2D(GL_TEXTURE_2D, 0, GLint(GL_RGBA8), width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+
+  glGenFramebuffers(1, &fbo_handle);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo_handle);
+
+  glFramebufferTexture(
+          GL_FRAMEBUFFER,
+          GL_COLOR_ATTACHMENT0,        // GL_DEPTH_ATTACHMENT
+          tex_handle,
+          0
+  );
+
+  glFramebufferRenderbuffer(
+          GL_FRAMEBUFFER,
+          GL_DEPTH_ATTACHMENT,
+          GL_RENDERBUFFER_EXT,
+          rb_handle
+  );
+
+  GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
+  glDrawBuffers(1, draw_buffers);
+
+  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  if (status != GL_FRAMEBUFFER_COMPLETE) {
+    throw std::runtime_error("FBO not working!");
+  }
+
+}
+
+
+
+
+
 
 std::string print(glm::mat4 mat) {
   std::string os ="\n{ \n";    // more generic version? - a mat type for every
@@ -246,8 +307,7 @@ int main(int argc, char* argv[]) {
   glfwGetFramebufferSize(window, &width, &height);
   update_view(window, width, height);
   update_camera();
-
-  initialize_buffers(width, height);
+  initialize_geometry();
 
   // set up models
   generate_solarSystem();
@@ -418,6 +478,47 @@ void initScreenQuad() {
                   -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, //vertice3
                   1.0f, 1.0f,0.0f, 1.0f, 1.0f //vertice4
           };
+
+
+
+  std::vector<GLuint> indices {
+          0, 1, 2, // t1
+          0, 2, 3  // t2
+  };
+
+  auto num_bytes = 5 * sizeof(GLfloat);
+
+  // generate vertex array object
+  glGenVertexArrays(1, &screenQuad_object.vertex_AO);
+  // bind the array for attaching buffers
+  glBindVertexArray(screenQuad_object.vertex_AO);
+
+  // generate generic buffer
+  glGenBuffers(1, &screenQuad_object.vertex_BO);
+  // bind this as an vertex array buffer containing all attributes
+  glBindBuffer(GL_ARRAY_BUFFER, screenQuad_object.vertex_BO);
+  // configure currently bound array buffer
+  glBufferData(GL_ARRAY_BUFFER, GLsizeiptr(GLsizei(sizeof(float) * vertices.size())), vertices.data(), GL_STATIC_DRAW);
+
+  // activate first attribute on gpu
+  glEnableVertexAttribArray(0);
+  // first attribute is 3 floats with no offset & stride
+  uintptr_t offset0 = 0 * sizeof(GLfloat);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, GLsizei(num_bytes), (const GLvoid*) offset0);
+
+  // activate third attribute on gpu
+  glEnableVertexAttribArray(1);
+  // second attribute is 2 floats with no offset & stride
+  uintptr_t offset1 = 3 * sizeof(GLfloat);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, GLsizei(num_bytes), (const GLvoid*) offset1);
+
+  std::cout << "Initialized!" << std::endl;
+
+}
+
+void initialize_geometry()
+{
+  initScreenQuad();
 }
 
 ///////////////////////// initialisation functions ////////////////////////////
@@ -494,36 +595,9 @@ model_object initialize_Planetgeometry( model & mod ) {
   return object_;
 }
 
-quad_object initialize_Quad( model & mod ){
-  quad_object object_;
-  // generate vertex array object
-  glGenVertexArrays(1, &object_.vertex_AO);
-  // bind the array for attaching buffers
-  glBindVertexArray(object_.vertex_AO);
-
-  // generate generic buffer
-  glGenBuffers(1, &object_.vertex_BO);
-  // bind this as an vertex array buffer containing all attributes
-  glBindBuffer(GL_ARRAY_BUFFER, object_.vertex_BO);
-  // configure currently bound array buffer
-  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mod.data.size(), mod.data.data(), GL_STATIC_DRAW);
-
-  // activate first attribute on gpu
-  glEnableVertexAttribArray(0);
-  // first attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(0, model::POSITION.components, (gl::GLenum) model::POSITION.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::POSITION]);
-  // activate second attribute on gpu
-  glEnableVertexAttribArray(1);
-  // second attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(1, model::NORMAL.components, (gl::GLenum) model::NORMAL.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::NORMAL]);
-// activate second attribute on gpu
-  glEnableVertexAttribArray(2);
-  // second attribute is 3 floats with no offset & stride
-  glVertexAttribPointer(2, model::TEXCOORD.components, (gl::GLenum) model::TEXCOORD.type, GL_FALSE, mod.vertex_bytes, mod.offsets[model::TEXCOORD]);
 
 
-  return object_;
-}
+
 
 ///////////////////////////// render functions ////////////////////////////////
 // render model
@@ -625,61 +699,7 @@ void render_screenQuad() {
   glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }
 
-void initialize_buffers(int width, int height) {
-  // create a RGB color texture
-  glGenTextures(1, &tex_handle);
-  glBindTexture(GL_TEXTURE_2D, tex_handle);
 
-  // interpolation -> fragment covers multiple texels (texture pixel)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GLint( GL_LINEAR));
-  // interpolation -> fragment dosnt exaclty cover one texel
-  //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GLint( GL_LINEAR));
-
-  glTexImage2D(GL_TEXTURE_2D,
-               0,
-               GLint(GL_RGBA),
-               width, height,
-               0,
-               GL_RGBA,
-               GL_FLOAT,
-               &tex_handle
-  );
-
-  // generate renderbuffer
-  glGenRenderbuffers(1,&rb_handle);
-  glBindRenderbuffer(GL_RENDERBUFFER, rb_handle);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
-
-  // generate a framebuffer
-  glGenFramebuffers(1, &fbo_handle);
-  // bind it as the target for rendering commands
-  glBindFramebuffer(GL_FRAMEBUFFER, fbo_handle);
-
-  // Fraebuffer nur einmal erstellen
-  //  somit in eigene init.
-  // Texturen erstellen und laden
-
-  // attach color
-  glFramebufferTexture(GL_FRAMEBUFFER,
-                       GL_COLOR_ATTACHMENT0, // or GL_DEPTH_ATTACHMENT
-                       tex_handle,
-                       0);
-
-  glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-                            GL_DEPTH_ATTACHMENT, // or GL_STENCIL_ATTACHMENT
-                            GL_RENDERBUFFER, rb_handle);
-
-  // define the index array for the outputs
-  // 1 or n
-  GLenum draw_buffers[1] = { GL_COLOR_ATTACHMENT0};
-  glDrawBuffers(1,  draw_buffers);
-
-  GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-  if (status != GL_FRAMEBUFFER_COMPLETE)
-    printf("There is an error in the FBO\n");
-  // throwning a bit better.... maybe...
-
-}
 
 ///////////////////////////// update functions ////////////////////////////////
 // update viewport and field of view
@@ -687,6 +707,10 @@ void update_view(GLFWwindow* window, int width, int height) {
 
   // resize framebuffer
   glViewport(0, 0, width, height);
+
+  init_render_buffer(width, height);
+  init_frame_buffers(width, height);
+
 
   float aspect = float(width) / float(height);
   float fov_y = camera_fov;
