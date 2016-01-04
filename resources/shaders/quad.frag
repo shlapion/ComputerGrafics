@@ -15,7 +15,7 @@ const vec3 luminance = vec3(0.2126f,0.7152f,0.0722f);
 void main() {
 
    vec2 textureCoordinates = pass_TextureCoordinate;
-   vec4 color = vec4(0.0f);
+   vec4 color = texture(Texture, textureCoordinates);
 
    if (isGreyscale) {
      color = vec4(vec3(dot(luminance,color.rgb)),color.a);
