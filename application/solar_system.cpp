@@ -915,6 +915,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     is_greyscale = !is_greyscale;
     glUseProgram(screenQuad_program);
     glUniform1i(squad_location_greyscale , is_greyscale);
+    std::cout << "Action greyscale" << std::endl;
     //upload boolian
   }
   else if (key==GLFW_KEY_8 && action == GLFW_PRESS) {
@@ -922,6 +923,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     is_flipped_horizontal = !is_flipped_horizontal;
     glUseProgram(screenQuad_program);
     glUniform1i(squad_location_fliphorizontal , is_flipped_horizontal);
+    std::cout << "Action flip horizontal" << std::endl;
     //upload boolian
   }
   else if (key==GLFW_KEY_9 && action == GLFW_PRESS) {
@@ -929,6 +931,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     is_flipped_vertical = !is_flipped_vertical;
     glUseProgram(screenQuad_program);
     glUniform1i(squad_location_flipvertical , is_flipped_vertical);
+    std::cout << "Action flip vertical" << std::endl;
     //upload boolian
   }
   else if (key==GLFW_KEY_0 && action == GLFW_PRESS) {
@@ -936,6 +939,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     is_gaussianblurred = !is_gaussianblurred;
     glUseProgram(screenQuad_program);
     glUniform1i(squad_location_gaussian , is_gaussianblurred);
+    std::cout << "Action gaussian" << std::endl;
     //upload boolian
   }
 //  else if(key==GLFW_KEY_9 && action == GLFW_PRESS) {
