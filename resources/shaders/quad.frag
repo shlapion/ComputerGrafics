@@ -35,7 +35,19 @@ void main() {
    }
 
    if (isGaussianblurred) {
-     //color +=
+     vec2 pixel_offset = pass_TextureCoordinate / gl_FragCoord.xy;
+
+     color += texture(Texture, vec2( textureCoordinates.x - pixel_offset.x, textureCoordinates.y + pixel_offset.y )) * 1/16;
+     color += texture(Texture, vec2( textureCoordinates.x                 , textureCoordinates.y + pixel_offset.y )) * 1/8;
+     color += texture(Texture, vec2( textureCoordinates.x + pixel_offset.x, textureCoordinates.y + pixel_offset.y )) * 1/16;
+
+     color += texture(Texture, vec2( textureCoordinates.x - pixel_offset.x, textureCoordinates.y                  )) * 1/8;
+     color += texture(Texture, vec2( textureCoordinates.x                 , textureCoordinates.y                  )) * 1/4;
+     color += texture(Texture, vec2( textureCoordinates.x + pixel_offset.x, textureCoordinates.y                  )) * 1/8;
+
+     color += texture(Texture, vec2( textureCoordinates.x - pixel_offset.x, textureCoordinates.y - pixel_offset.y )) * 1/16;
+     color += texture(Texture, vec2( textureCoordinates.x                 , textureCoordinates.y - pixel_offset.y )) * 1/8;
+     color += texture(Texture, vec2( textureCoordinates.x + pixel_offset.x, textureCoordinates.y - pixel_offset.y )) * 1/16;
    }
 
 
