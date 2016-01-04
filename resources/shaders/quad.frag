@@ -35,7 +35,7 @@ void main() {
    }
 
    if (isGaussianblurred) {
-     //color =
+     //color +=
    }
 
 
