@@ -27,12 +27,7 @@ void main() {
      color = texture(Texture, textureCoordinates);
    }
 
-   if (isGreyscale) {
-        color = vec4(vec3(dot(luminance,color.rgb)),color.a);
-   }
-   else {
-      color = texture(Texture, textureCoordinates);
-   }
+
 
    if (isGaussianblurred) {
      vec2 pixel_offset = pass_TextureCoordinate / gl_FragCoord.xy;
@@ -48,8 +43,13 @@ void main() {
      color += texture(Texture, vec2( textureCoordinates.x - pixel_offset.x, textureCoordinates.y - pixel_offset.y )) * 1/16;
      color += texture(Texture, vec2( textureCoordinates.x                 , textureCoordinates.y - pixel_offset.y )) * 1/8;
      color += texture(Texture, vec2( textureCoordinates.x + pixel_offset.x, textureCoordinates.y - pixel_offset.y )) * 1/16;
+   } else {
+        color = texture(Texture, textureCoordinates);
    }
 
+    if (isGreyscale) {
+       color = vec4(vec3(dot(luminance,color.rgb)),color.a);
+    }
 
    out_Color = color;
 
