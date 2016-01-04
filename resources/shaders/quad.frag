@@ -23,9 +23,11 @@ void main() {
 
    if (isFlippedHorizontal) {
      textureCoordinates = vec2(1.0f-textureCoordinates.x, textureCoordinates.y);
+     color = texture(Texture, textureCoordinates);
    }
    if (isFlippedVertical) {
      textureCoordinates = vec2(textureCoordinates.x, 1.0f-textureCoordinates.y);
+     color = texture(Texture, textureCoordinates);
    }
 
    if (isGaussianblurred) {
