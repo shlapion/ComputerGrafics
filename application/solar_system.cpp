@@ -123,7 +123,7 @@ GLint orbit_view_matrix = -1;
 GLint orbit_projection_matrix = -1;
 
 // screen quad locations
-
+GLint squad_location_texture_coordinate = -1;
 GLint squad_location_greyscale = -1;
 GLint squad_location_flipvertical = -1;
 GLint squad_location_fliphorizontal = -1;
@@ -148,7 +148,6 @@ void update_shader_programs(bool throwing = false);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void cursor_callback(GLFWwindow * window, double x, double y);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-
 void generate_solarSystem();
 void generate_starCloud();
 void generate_orbits();
@@ -169,7 +168,7 @@ void render();
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time);
 //void render_starfield();
 void render_orbit(Planet* const& planet, float delta);
-void render_screenQuad();
+
 
 
 
@@ -596,48 +595,6 @@ model_object initialize_Planetgeometry( model & mod ) {
 }
 
 
-
-
-
-///////////////////////////// render functions ////////////////////////////////
-// render model
-//Actual size of the planets referenced to the earth.
-void render() {
-  glUseProgram(starCloud_program);
-  glBindVertexArray(starfield_object.vertex_AO);
-  utils::validate_program(starCloud_program);
-  glDrawArrays(GL_POINTS, 0, number_of_stars);
-
-
-  glUseProgram(planet_program);
-  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,9.90f};
-  Planet* milkyway = new Planet{"milkyway", 0.0f, 0.0f, AU_scale * 1000,"milk",{0,0,0}};
-  glm::mat4 translation_sun{};glm::mat4 translation_milkyway{};
-  render_Planet(sun,translation_sun,0);
-  render_Planet(milkyway,translation_milkyway,0);
-
-  for (auto const &p : solarSystem) {
-    float time = float(glfwGetTime());
-    Planet* current = p;
-    glm::mat4 translation;
-    glm::vec3 position;
-    if (p->name!="sun"&p->name!="milkyway") render_Planet(p, translation, time);
-  }
-
-
-  //render_planet();
-
-  glUseProgram(orbit_program);
-  for (auto const&p:solarSystem) {
-      float deltaDistance = p->distance - (p->size/2);
-      // p isnt needed at the moment.
-      render_orbit(p, deltaDistance);
-  }
-
-  render_screenQuad();
-
-}
-
 void render_Planet(Planet* const& planet, glm::mat4 & model_matrix, float time) {
   glUseProgram(planet_program);
   model_matrix = glm::rotate(model_matrix,time * planet->speed * speed_time, glm::vec3{ 0.0f, 1.0f, 0.0f }); // axis of rotation
@@ -689,15 +646,74 @@ void render_orbit(Planet* const& planet, float delta) {
   glDrawArrays(GL_LINES,0,number_of_orbitFragment);
 }
 
+
 void render_screenQuad() {
   glUseProgram(screenQuad_program);
   glActiveTexture(GL_TEXTURE0);
-  //glBindTexture(GL_TEXTURE_2D,screenQuadTexture);
+  glBindTexture(GL_TEXTURE_2D,tex_handle);
 
   glBindVertexArray(screenQuad_object.vertex_AO);
   utils::validate_program(screenQuad_program);
   glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 }
+
+
+
+
+///////////////////////////// render functions ////////////////////////////////
+// render model
+//Actual size of the planets referenced to the earth.
+void render() {
+
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo_handle);
+
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glClearDepth(1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+  glUseProgram(starCloud_program);
+  glBindVertexArray(starfield_object.vertex_AO);
+  utils::validate_program(starCloud_program);
+  glDrawArrays(GL_POINTS, 0, number_of_stars);
+
+
+  glUseProgram(planet_program);
+  Planet* sun =     new Planet{"sun",      0.0f   ,0.0f,9.90f};
+  Planet* milkyway = new Planet{"milkyway", 0.0f, 0.0f, AU_scale * 1000,"milk",{0,0,0}};
+  glm::mat4 translation_sun{};glm::mat4 translation_milkyway{};
+  render_Planet(sun,translation_sun,0);
+  render_Planet(milkyway,translation_milkyway,0);
+
+  for (auto const &p : solarSystem) {
+    float time = float(glfwGetTime());
+    Planet* current = p;
+    glm::mat4 translation;
+    glm::vec3 position;
+    if (p->name!="sun"&p->name!="milkyway") render_Planet(p, translation, time);
+  }
+
+
+  //render_planet();
+
+  glUseProgram(orbit_program);
+  for (auto const&p:solarSystem) {
+      float deltaDistance = p->distance - (p->size/2);
+      // p isnt needed at the moment.
+      render_orbit(p, deltaDistance);
+  }
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  glClearDepth(1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  render_screenQuad();
+
+}
+
+
 
 
 
